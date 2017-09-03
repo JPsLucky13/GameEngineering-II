@@ -52,14 +52,14 @@ void eae6320::Graphics::Effect::Bind()
 			EAE6320_ASSERT(m_vertexShader);
 			auto* const shader = cShader::s_manager.Get(m_vertexShader);
 			EAE6320_ASSERT(shader && shader->m_shaderObject.vertex);
-			m_currentContext->VSSetShader(shader->m_shaderObject.vertex, noInterfaces, interfaceCount);
+			m_direct3dContext->VSSetShader(shader->m_shaderObject.vertex, noInterfaces, interfaceCount);
 		}
 		// Fragment shader
 		{
 			EAE6320_ASSERT(m_fragmentShader);
 			auto* const shader = cShader::s_manager.Get(m_fragmentShader);
 			EAE6320_ASSERT(shader && shader->m_shaderObject.fragment);
-			m_currentContext->PSSetShader(shader->m_shaderObject.fragment, noInterfaces, interfaceCount);
+			m_direct3dContext->PSSetShader(shader->m_shaderObject.fragment, noInterfaces, interfaceCount);
 		}
 	}
 	m_renderState.Bind();

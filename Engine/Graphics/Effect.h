@@ -41,7 +41,7 @@ namespace eae6320
 #endif
 			eae6320::Graphics::cRenderState m_renderState;
 #if defined( EAE6320_PLATFORM_D3D )
-			eae6320::Graphics::sContext * m_currentContext;
+			ID3D11DeviceContext* m_direct3dContext;
 #endif
 
 			// Functions
