@@ -24,7 +24,7 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize()
 		// Load the compiled binary vertex shader for the input layout
 		eae6320::Platform::sDataFromFile vertexShaderDataFromFile;
 		std::string errorMessage;
-		if (result = eae6320::Platform::LoadBinaryFile("data/Shaders/Vertex/vertexInputLayout_geometry.shd", vertexShaderDataFromFile, &errorMessage))
+		if (result = eae6320::Platform::LoadBinaryFile("data/Shaders/Vertex/vertexInputLayout_geometrySprite.shd", vertexShaderDataFromFile, &errorMessage))
 		{
 			// Create the vertex layout
 
@@ -75,7 +75,7 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize()
 	}
 	// Vertex Buffer
 	{
-		constexpr unsigned int triangleCount = 1;
+		constexpr unsigned int triangleCount = 2;
 		constexpr unsigned int vertexCountPerTriangle = 3;
 		const auto vertexCount = triangleCount * vertexCountPerTriangle;
 		eae6320::Graphics::VertexFormats::sSprite vertexData[vertexCount];
@@ -88,6 +88,15 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize()
 
 			vertexData[2].x = 1.0f;
 			vertexData[2].y = 0.0f;
+
+			vertexData[3].x = 0.0f;
+			vertexData[3].y = 0.0f;
+
+			vertexData[4].x = 0.0f;
+			vertexData[4].y = 1.0f;
+
+			vertexData[5].x = 1.0f;
+			vertexData[5].y = 1.0f;
 		}
 		D3D11_BUFFER_DESC bufferDescription{};
 		{
@@ -152,7 +161,7 @@ void eae6320::Graphics::Sprite::Draw()
 	{
 		// As of this comment only a single triangle is drawn
 		// (you will have to update this code in future assignments!)
-		constexpr unsigned int triangleCount = 1;
+		constexpr unsigned int triangleCount = 2;
 		constexpr unsigned int vertexCountPerTriangle = 3;
 		constexpr auto vertexCountToRender = triangleCount * vertexCountPerTriangle;
 		// It's possible to start rendering primitives in the middle of the stream
