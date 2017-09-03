@@ -54,6 +54,12 @@
     <ClCompile Include="cShader.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="sContext.cpp" />
+    <ClCompile Include="Effect.d3d.cpp">
+      <Filter>Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.gl.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Direct3D\Includes.h">
@@ -74,6 +80,7 @@
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="sContext.h" />
     <ClInclude Include="VertexFormats.h" />
+    <ClInclude Include="Effect.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cRenderState.inl" />
