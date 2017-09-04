@@ -170,23 +170,7 @@ void eae6320::Graphics::RenderFrame()
 	{
 		sprite.Draw();
 	}
-	// Everything has been drawn to the "back buffer", which is just an image in memory.
-	// In order to display it the contents of the back buffer must be "presented"
-	// (or "swapped" with the "front buffer")
-	{
-		const auto deviceContext = sContext::g_context.deviceContext;
-		EAE6320_ASSERT( deviceContext != NULL );
-
-		const auto glResult = SwapBuffers( deviceContext );
-		EAE6320_ASSERT( glResult != FALSE );
-	}
-
-	// Once everything has been drawn the data that was submitted for this frame
-	// should be cleaned up and cleared.
-	// so that the struct can be re-used (i.e. so that data for a new frame can be submitted to it)
-	{
-		// (At this point in the class there isn't anything that needs to be cleaned up)
-	}
+	
 }
 
 // Initialization / Clean Up

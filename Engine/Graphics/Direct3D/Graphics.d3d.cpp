@@ -177,24 +177,7 @@ void eae6320::Graphics::RenderFrame()
 		
 	
 
-	// Everything has been drawn to the "back buffer", which is just an image in memory.
-	// In order to display it the contents of the back buffer must be "presented"
-	// (or "swapped" with the "front buffer")
-	{
-		auto* const swapChain = sContext::g_context.swapChain;
-		EAE6320_ASSERT( swapChain );
-		constexpr unsigned int swapImmediately = 0;
-		constexpr unsigned int presentNextFrame = 0;
-		const auto result = swapChain->Present( swapImmediately, presentNextFrame );
-		EAE6320_ASSERT( SUCCEEDED( result ) );
-	}
-
-	// Once everything has been drawn the data that was submitted for this frame
-	// should be cleaned up and cleared.
-	// so that the struct can be re-used (i.e. so that data for a new frame can be submitted to it)
-	{
-		// (At this point in the class there isn't anything that needs to be cleaned up)
-	}
+	
 }
 
 // Initialization / Clean Up
