@@ -20,6 +20,7 @@ layout( std140, binding = 1 ) uniform g_constantBuffer_perMaterial
 	vec4 g_color;
 };
 
+
 // Output
 //=======
 

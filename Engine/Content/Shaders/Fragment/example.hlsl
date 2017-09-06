@@ -4,7 +4,6 @@
 
 #include <Shaders/shaders.inc>
 
-
 // Constant Buffers
 //=================
 
@@ -20,7 +19,6 @@ cbuffer g_constantBuffer_perMaterial : register(b1)
 {
 	float4 g_color;
 }
-
 
 // Entry Point
 //============
