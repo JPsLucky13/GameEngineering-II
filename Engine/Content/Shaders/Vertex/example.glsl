@@ -26,6 +26,7 @@ layout( std140, binding = 2 ) uniform g_constantBuffer_perDrawCall
 	vec4 DUMMY;
 };
 
+
 // Input
 //======
 
@@ -49,7 +50,7 @@ void main()
 {
 	// Calculate the position of this vertex on screen
 	{
-		gl_Position = vec4( i_position.x, i_position.y, 0.0, 1.0 );
+		gl_Position = float4(i_position.x * cos(g_elapsedSecondCount_simulationTime) - i_position.y * sin(g_elapsedSecondCount_simulationTime) + sin(g_elapsedSecondCount_simulationTime) * 0.5, i_position.y * cos(g_elapsedSecondCount_simulationTime) + i_position.x * sin(g_elapsedSecondCount_simulationTime), 0.0, 1.0);
 
 		// This example shader sets the "out" position directly from the "in" position:
 		//gl_Position = vec4( i_position.x, i_position.y, 0.0, 1.0 );
