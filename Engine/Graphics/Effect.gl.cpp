@@ -10,31 +10,19 @@
 
 // Initialization / Clean Up
 //--------------------------
-eae6320::cResult eae6320::Graphics::Effect::Initialize()
+
+void eae6320::Graphics::Effect::Bind()
 {
-	auto result = eae6320::Results::Success;
+	{
+		EAE6320_ASSERT(m_programId != 0);
+		glUseProgram(m_programId);
+		EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
+	}
+	m_renderState.Bind();
+}
 
-	if (!(result = eae6320::Graphics::cShader::s_manager.Load("data/Shaders/Vertex/sprite.shd",
-		m_vertexShader, eae6320::Graphics::ShaderTypes::Vertex)))
-	{
-		EAE6320_ASSERT(false);
-		goto OnExit;
-	}
-	if (!(result = eae6320::Graphics::cShader::s_manager.Load("data/Shaders/Fragment/sprite.shd",
-		m_fragmentShader, eae6320::Graphics::ShaderTypes::Fragment)))
-	{
-		EAE6320_ASSERT(false);
-		goto OnExit;
-	}
-	{
-		constexpr uint8_t defaultRenderState = 0;
-		if (!(result = m_renderState.Initialize(defaultRenderState)))
-		{
-			EAE6320_ASSERT(false);
-			goto OnExit;
-		}
-	}
-
+eae6320::cResult eae6320::Graphics::Effect::CreateProgram(eae6320::cResult & result)
+{
 	// Create a program
 	{
 		m_programId = glCreateProgram();
@@ -186,23 +174,12 @@ OnExit:
 		}
 	}
 	return result;
+
+
+
 }
 
-
-
-
-void eae6320::Graphics::Effect::Bind()
-{
-	{
-		EAE6320_ASSERT(m_programId != 0);
-		glUseProgram(m_programId);
-		EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
-	}
-	m_renderState.Bind();
-}
-
-
-void eae6320::Graphics::Effect::CleanUp(eae6320::cResult & result)
+eae6320::cResult eae6320::Graphics::Effect::CheckProgramID(eae6320::cResult & result)
 {
 	if (m_programId != 0)
 	{
@@ -220,39 +197,7 @@ void eae6320::Graphics::Effect::CleanUp(eae6320::cResult & result)
 		}
 		m_programId = 0;
 	}
-	if (m_vertexShader)
-	{
-		const auto localResult = cShader::s_manager.Release(m_vertexShader);
-		if (!localResult)
-		{
-			EAE6320_ASSERT(false);
-			if (result)
-			{
-				result = localResult;
-			}
-		}
-	}
-	if (m_fragmentShader)
-	{
-		const auto localResult = cShader::s_manager.Release(m_fragmentShader);
-		if (!localResult)
-		{
-			EAE6320_ASSERT(false);
-			if (result)
-			{
-				result = localResult;
-			}
-		}
-	}
-	{
-		const auto localResult = m_renderState.CleanUp();
-		if (!localResult)
-		{
-			EAE6320_ASSERT(false);
-			if (result)
-			{
-				result = localResult;
-			}
-		}
-	}
+
+	return result;
+
 }
