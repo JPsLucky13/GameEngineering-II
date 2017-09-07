@@ -60,6 +60,11 @@ namespace eae6320
 			//====
 			void CleanUp(eae6320::cResult & result);
 
+			//Create Program
+			eae6320::cResult CreateProgram(eae6320::cResult & result);
+
+			//Check Program Id
+			eae6320::cResult CheckProgramID(eae6320::cResult & result);
 
 		private:
 
