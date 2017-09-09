@@ -8,6 +8,11 @@
 
 // Implementation
 //===============
+void eae6320::Graphics::Sprite::GetContext()
+{
+
+}
+
 
 // Initialization / Clean Up
 //--------------------------

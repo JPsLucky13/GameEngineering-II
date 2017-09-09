@@ -6,8 +6,8 @@ This file declares the external interface for the effect
 //==============
 #include "cShader.h"
 #include "cRenderState.h"
-#include "OpenGL\Includes.h"
 #include "sContext.h"
+#include "../Graphics/Direct3D/Includes.h"
 
 #include <cstdint>
 #include <Engine/Results/Results.h>
@@ -24,7 +24,7 @@ namespace eae6320
 {
 	namespace Graphics
 	{
-		struct Effect
+		struct View
 		{
 			// Interface
 			//==========
@@ -34,41 +34,26 @@ namespace eae6320
 			// Data
 			//=====
 
-			eae6320::Graphics::cShader::Handle m_vertexShader;
-			eae6320::Graphics::cShader::Handle m_fragmentShader;
-
-#if defined( EAE6320_PLATFORM_GL )
-			GLuint m_programId = 0;
+#if defined( EAE6320_PLATFORM_D3D )
+			// In Direct3D "views" are objects that allow a texture to be used a particular way:
+			// A render target view allows a texture to have color rendered to it
+			ID3D11RenderTargetView* m_renderTargetView = nullptr;
+			// A depth/stencil view allows a texture to have depth rendered to it
+			ID3D11DepthStencilView* m_depthStencilView = nullptr;
 #endif
-			eae6320::Graphics::cRenderState m_renderState;
 
 
 			// Functions
 			//====
-
-			//Set Context
 			void GetContext();
 
-			//Initialize
-			//====
-			eae6320::cResult Initialize();
+			eae6320::cResult InitializeViews(const unsigned int i_resolutionWidth, const unsigned int i_resolutionHeight);
 
-			//Bind
-			//====
-			void Bind();
+			void CleanUp();
 
-			//CleanUp
-			//====
-			void CleanUp(eae6320::cResult & result);
-
-			//Create Program
-			eae6320::cResult CreateProgram(eae6320::cResult & result);
-
-			//Check Program Id
-			eae6320::cResult CheckProgramID(eae6320::cResult & result);
+			void ClearColor();
 
 		private:
-
 			// Data
 			//=====
 #if defined( EAE6320_PLATFORM_D3D )
@@ -77,5 +62,3 @@ namespace eae6320
 		};
 	}
 }
-
-

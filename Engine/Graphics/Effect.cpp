@@ -7,6 +7,7 @@
 // Implementation
 //===============
 
+
 // Initialization / Clean Up
 //--------------------------
 eae6320::cResult eae6320::Graphics::Effect::Initialize()
@@ -85,3 +86,4 @@ void eae6320::Graphics::Effect::CleanUp(eae6320::cResult & result)
 	}
 
 }
+

@@ -41,7 +41,7 @@ namespace eae6320
 			// with the input from a vertex shader
 			ID3D11InputLayout* m_vertexInputLayout = nullptr;
 
-			ID3D11DeviceContext* m_direct3dContext;
+			
 #elif defined( EAE6320_PLATFORM_GL )
 			// A vertex buffer holds the data for each vertex
 			GLuint m_vertexBufferId = 0;
@@ -52,6 +52,9 @@ namespace eae6320
 			// Functions
 			//====
 
+			// Get
+			//====
+			void GetContext();
 
 			//Initialize
 			//====
@@ -67,6 +70,13 @@ namespace eae6320
 
 
 		private:
+
+			//Data
+			//====
+#if defined( EAE6320_PLATFORM_D3D )
+			ID3D11DeviceContext* m_direct3dContext;
+#endif
+
 
 		};
 	}

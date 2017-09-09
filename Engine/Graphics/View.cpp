@@ -1,4 +1,4 @@
-#include "Effect.h"
+#include "View.h"
 #include "..//Graphics//Direct3D/Includes.h"
 #include "sContext.h"
 
@@ -7,14 +7,6 @@
 
 // Implementation
 //===============
-
-void eae6320::Graphics::Effect::GetContext()
-{
-	auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
-	EAE6320_ASSERT(direct3dImmediateContext);
-	m_direct3dContext = direct3dImmediateContext;
-}
-
 
 // Initialization / Clean Up
 //--------------------------
@@ -41,15 +33,5 @@ void eae6320::Graphics::Effect::Bind()
 	}
 	m_renderState.Bind();
 
-
-}
-
-eae6320::cResult eae6320::Graphics::Effect::CreateProgram(eae6320::cResult & result) {
-	return result;
-}
-
-eae6320::cResult eae6320::Graphics::Effect::CheckProgramID(eae6320::cResult & result)
-{
-	return result;
 
 }

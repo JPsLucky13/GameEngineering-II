@@ -10,6 +10,14 @@
 // Implementation
 //===============
 
+void eae6320::Graphics::Sprite::GetContext()
+{
+	auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+	EAE6320_ASSERT(direct3dImmediateContext);
+	m_direct3dContext = direct3dImmediateContext;
+}
+
+
 // Initialization / Clean Up
 //--------------------------
 eae6320::cResult eae6320::Graphics::Sprite::Initialize()
