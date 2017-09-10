@@ -1,12 +1,15 @@
-#include "Effect.h"
-#include "..//Graphics//Direct3D/Includes.h"
-#include "sContext.h"
+#include "../Effect.h"
+#include "Includes.h"
+#include "../sContext.h"
 
 
 #include <Engine\Asserts\Asserts.h>
 
 // Implementation
 //===============
+void eae6320::Graphics::Effect::GetContext()
+{
+}
 
 // Initialization / Clean Up
 //--------------------------
@@ -18,7 +21,7 @@ void eae6320::Graphics::Effect::Bind()
 		glUseProgram(m_programId);
 		EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
 	}
-	m_renderState.Bind();
+	BindRenderState();
 }
 
 eae6320::cResult eae6320::Graphics::Effect::CreateProgram(eae6320::cResult & result)

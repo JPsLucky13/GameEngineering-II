@@ -1,25 +1,38 @@
 #include "Effect.h"
 #include "sContext.h"
-
+#include <string.h>
 
 #include <Engine\Asserts\Asserts.h>
 
 // Implementation
 //===============
 
+
 // Initialization / Clean Up
 //--------------------------
-eae6320::cResult eae6320::Graphics::Effect::Initialize()
+eae6320::cResult eae6320::Graphics::Effect::Initialize(char * vertexShaderName, char * fragmentShaderName)
 {
 	auto result = eae6320::Results::Success;
 
-	if (!(result = eae6320::Graphics::cShader::s_manager.Load("data/Shaders/Vertex/sprite.shd",
+	char path[256];
+	strcpy(path, "data/Shaders/Vertex/");
+	strcat(path, vertexShaderName);
+	strcat(path, ".shd");
+	puts(path);
+
+	if (!(result = eae6320::Graphics::cShader::s_manager.Load(path,
 		m_vertexShader, eae6320::Graphics::ShaderTypes::Vertex)))
 	{
 		EAE6320_ASSERT(false);
 		goto OnExit;
 	}
-	if (!(result = eae6320::Graphics::cShader::s_manager.Load("data/Shaders/Fragment/sprite.shd",
+
+	char path2[256];
+	strcpy(path2, "data/Shaders/Fragment/");
+	strcat(path2, fragmentShaderName);
+	strcat(path2, ".shd");
+	puts(path2);
+	if (!(result = eae6320::Graphics::cShader::s_manager.Load(path2,
 		m_fragmentShader, eae6320::Graphics::ShaderTypes::Fragment)))
 	{
 		EAE6320_ASSERT(false);
@@ -40,6 +53,11 @@ eae6320::cResult eae6320::Graphics::Effect::Initialize()
 OnExit:
 	return result;
 
+}
+
+void eae6320::Graphics::Effect::BindRenderState()
+{
+	m_renderState.Bind();
 }
 
 void eae6320::Graphics::Effect::CleanUp(eae6320::cResult & result)
@@ -85,3 +103,4 @@ void eae6320::Graphics::Effect::CleanUp(eae6320::cResult & result)
 	}
 
 }
+

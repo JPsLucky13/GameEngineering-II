@@ -1,4 +1,4 @@
-#include "Effect.h"
+#include "View.h"
 #include "..//Graphics//Direct3D/Includes.h"
 #include "sContext.h"
 
@@ -33,15 +33,5 @@ void eae6320::Graphics::Effect::Bind()
 	}
 	m_renderState.Bind();
 
-
-}
-
-eae6320::cResult eae6320::Graphics::Effect::CreateProgram(eae6320::cResult & result) {
-	return result;
-}
-
-eae6320::cResult eae6320::Graphics::Effect::CheckProgramID(eae6320::cResult & result)
-{
-	return result;
 
 }

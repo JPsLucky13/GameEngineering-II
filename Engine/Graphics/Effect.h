@@ -6,7 +6,11 @@ This file declares the external interface for the effect
 //==============
 #include "cShader.h"
 #include "cRenderState.h"
+
+#if defined( EAE6320_PLATFORM_GL )
 #include "OpenGL\Includes.h"
+#endif
+
 #include "sContext.h"
 
 #include <cstdint>
@@ -34,27 +38,25 @@ namespace eae6320
 			// Data
 			//=====
 
-			eae6320::Graphics::cShader::Handle m_vertexShader;
-			eae6320::Graphics::cShader::Handle m_fragmentShader;
-#if defined( EAE6320_PLATFORM_GL )
-			GLuint m_programId = 0;
-#endif
-			eae6320::Graphics::cRenderState m_renderState;
-#if defined( EAE6320_PLATFORM_D3D )
-			ID3D11DeviceContext* m_direct3dContext;
-#endif
+
+
+
 
 			// Functions
 			//====
 
+			//Set Context
+			void GetContext();
 
 			//Initialize
 			//====
-			eae6320::cResult Initialize();
+			eae6320::cResult Initialize(char * vertexShaderName, char * fragmentShaderName);
 
 			//Bind
 			//====
 			void Bind();
+
+			void BindRenderState();
 
 			//CleanUp
 			//====
@@ -67,6 +69,23 @@ namespace eae6320
 			eae6320::cResult CheckProgramID(eae6320::cResult & result);
 
 		private:
+
+			// Data
+			//=====
+#if defined( EAE6320_PLATFORM_D3D )
+			ID3D11DeviceContext* m_direct3dContext;
+#endif
+
+#if defined( EAE6320_PLATFORM_GL )
+			GLuint m_programId = 0;
+#endif
+			// Data
+			//=====
+
+			eae6320::Graphics::cShader::Handle m_vertexShader;
+			eae6320::Graphics::cShader::Handle m_fragmentShader;
+
+			eae6320::Graphics::cRenderState m_renderState;
 
 		};
 	}

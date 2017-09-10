@@ -1,7 +1,7 @@
-#include "Sprite.h"
-#include "..//Graphics//Direct3D/Includes.h"
-#include "sContext.h"
-#include "../Graphics/VertexFormats.h"
+#include "../Sprite.h"
+#include "Includes.h"
+#include "../sContext.h"
+#include "../VertexFormats.h"
 
 
 #include <Engine\Asserts\Asserts.h>
@@ -10,9 +10,17 @@
 // Implementation
 //===============
 
+void eae6320::Graphics::Sprite::GetContext()
+{
+	auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+	EAE6320_ASSERT(direct3dImmediateContext);
+	m_direct3dContext = direct3dImmediateContext;
+}
+
+
 // Initialization / Clean Up
 //--------------------------
-eae6320::cResult eae6320::Graphics::Sprite::Initialize()
+eae6320::cResult eae6320::Graphics::Sprite::Initialize(float centerPosX, float centerPosY, float width, float height)
 {
 	auto result = eae6320::Results::Success;
 
@@ -75,28 +83,22 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize()
 	}
 	// Vertex Buffer
 	{
-		constexpr unsigned int triangleCount = 2;
-		constexpr unsigned int vertexCountPerTriangle = 3;
+		constexpr unsigned int triangleCount = 1;
+		constexpr unsigned int vertexCountPerTriangle = 4;
 		const auto vertexCount = triangleCount * vertexCountPerTriangle;
 		eae6320::Graphics::VertexFormats::sSprite vertexData[vertexCount];
 		{
-			vertexData[0].x = 0.0f;
-			vertexData[0].y = 0.0f;
+			vertexData[0].x = centerPosX - width * 0.5f;
+			vertexData[0].y = centerPosY - height * 0.5f;
 
-			vertexData[1].x = 1.0f;
-			vertexData[1].y = 1.0f;
+			vertexData[1].x = centerPosX - width * 0.5f;
+			vertexData[1].y = centerPosY + height * 0.5f;
 
-			vertexData[2].x = 1.0f;
-			vertexData[2].y = 0.0f;
+			vertexData[2].x = centerPosX + width * 0.5f;
+			vertexData[2].y = centerPosY - height * 0.5f;
 
-			vertexData[3].x = 0.0f;
-			vertexData[3].y = 0.0f;
-
-			vertexData[4].x = 0.0f;
-			vertexData[4].y = 1.0f;
-
-			vertexData[5].x = 1.0f;
-			vertexData[5].y = 1.0f;
+			vertexData[3].x = centerPosX + width * 0.5f;
+			vertexData[3].y = centerPosY + height * 0.5f;
 		}
 		D3D11_BUFFER_DESC bufferDescription{};
 		{
@@ -155,38 +157,20 @@ void eae6320::Graphics::Sprite::Draw()
 		// Set the topology (which defines how to interpret multiple vertices as a single "primitive";
 		// the vertex buffer was defined as a triangle list
 		// (meaning that every primitive is a triangle and will be defined by three vertices)
-		m_direct3dContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_direct3dContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	}
 	// Render triangles from the currently-bound vertex buffer
 	{
 		// As of this comment only a single triangle is drawn
 		// (you will have to update this code in future assignments!)
-		constexpr unsigned int triangleCount = 2;
-		constexpr unsigned int vertexCountPerTriangle = 3;
+		constexpr unsigned int triangleCount = 1;
+		constexpr unsigned int vertexCountPerTriangle = 4;
 		constexpr auto vertexCountToRender = triangleCount * vertexCountPerTriangle;
 		// It's possible to start rendering primitives in the middle of the stream
 		constexpr unsigned int indexOfFirstVertexToRender = 0;
 		m_direct3dContext->Draw(vertexCountToRender, indexOfFirstVertexToRender);
 	}
-	// Everything has been drawn to the "back buffer", which is just an image in memory.
-	// In order to display it the contents of the back buffer must be "presented"
-	// (or "swapped" with the "front buffer")
-	{
-		auto* const swapChain = sContext::g_context.swapChain;
-		EAE6320_ASSERT(swapChain);
-		constexpr unsigned int swapImmediately = 0;
-		constexpr unsigned int presentNextFrame = 0;
-		const auto result = swapChain->Present(swapImmediately, presentNextFrame);
-		EAE6320_ASSERT(SUCCEEDED(result));
-	}
-
-	// Once everything has been drawn the data that was submitted for this frame
-	// should be cleaned up and cleared.
-	// so that the struct can be re-used (i.e. so that data for a new frame can be submitted to it)
-	{
-		// (At this point in the class there isn't anything that needs to be cleaned up)
-	}
-
+	
 }
 
 
