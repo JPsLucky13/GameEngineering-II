@@ -54,14 +54,8 @@ int main( int i_argumentCount, char** i_arguments )
 		std::string errorMessage;
 		int exitCode;
 		{
-			const auto shader_authored = engineSourceContentDir + "Shaders/Vertex/example."
-#if defined( EAE6320_PLATFORM_D3D )
-				"hlsl"
-#elif defined( EAE6320_PLATFORM_GL )
-				"glsl"
-#endif
-				;
-			const auto shader_built = gameInstallDir + "data/Shaders/Vertex/example.shd";
+			const auto shader_authored = engineSourceContentDir + "Shaders/Vertex/sprite.cgfx";
+			const auto shader_built = gameInstallDir + "data/Shaders/Vertex/sprite.shd";
 			if ( result = eae6320::Platform::CreateDirectoryIfItDoesntExist( shader_built, &errorMessage) )
 			{
 				if ( result = eae6320::Platform::ExecuteCommand( ( std::string( "\"" ) + path_shaderBuilder
@@ -86,14 +80,8 @@ int main( int i_argumentCount, char** i_arguments )
 			}
 		}
 		{
-			const auto shader_authored = engineSourceContentDir + "Shaders/Fragment/example."
-#if defined( EAE6320_PLATFORM_D3D )
-				"hlsl"
-#elif defined( EAE6320_PLATFORM_GL )
-				"glsl"
-#endif
-				;
-			const auto shader_built = gameInstallDir + "data/Shaders/Fragment/example.shd";
+			const auto shader_authored = engineSourceContentDir + "Shaders/Fragment/sprite1.cgfx";
+			const auto shader_built = gameInstallDir + "data/Shaders/Fragment/sprite1.shd";
 			if ( result = eae6320::Platform::CreateDirectoryIfItDoesntExist( shader_built, &errorMessage ) )
 			{
 				if ( result = eae6320::Platform::ExecuteCommand( ( std::string( "\"" ) + path_shaderBuilder
@@ -119,8 +107,8 @@ int main( int i_argumentCount, char** i_arguments )
 		}
 #if defined( EAE6320_PLATFORM_D3D )
 		{
-			const auto shader_authored = engineSourceContentDir + "Shaders/Vertex/vertexInputLayout_geometry.hlsl";
-			const auto shader_built = gameInstallDir + "data/Shaders/Vertex/vertexInputLayout_geometry.shd";
+			const auto shader_authored = engineSourceContentDir + "Shaders/Vertex/vertexInputLayout_geometrySprite.cgfx";
+			const auto shader_built = gameInstallDir + "data/Shaders/Vertex/vertexInputLayout_geometrySprite.shd";
 			if ( result = eae6320::Platform::CreateDirectoryIfItDoesntExist( shader_built, &errorMessage ) )
 			{
 				if ( result = eae6320::Platform::ExecuteCommand( ( std::string( "\"" ) + path_shaderBuilder
@@ -153,13 +141,7 @@ int main( int i_argumentCount, char** i_arguments )
 		std::string errorMessage;
 		int exitCode;
 		{
-			const auto shader_authored = engineSourceContentDir + "Shaders/Vertex/sprite."
-#if defined( EAE6320_PLATFORM_D3D )
-				"hlsl"
-#elif defined( EAE6320_PLATFORM_GL )
-				"glsl"
-#endif
-				;
+			const auto shader_authored = engineSourceContentDir + "Shaders/Vertex/sprite.cgfx";
 			const auto shader_built = gameInstallDir + "data/Shaders/Vertex/sprite.shd";
 			if (result = eae6320::Platform::CreateDirectoryIfItDoesntExist(shader_built, &errorMessage))
 			{
@@ -185,14 +167,8 @@ int main( int i_argumentCount, char** i_arguments )
 			}
 		}
 		{
-			const auto shader_authored = engineSourceContentDir + "Shaders/Fragment/sprite."
-#if defined( EAE6320_PLATFORM_D3D )
-				"hlsl"
-#elif defined( EAE6320_PLATFORM_GL )
-				"glsl"
-#endif
-				;
-			const auto shader_built = gameInstallDir + "data/Shaders/Fragment/sprite.shd";
+			const auto shader_authored = engineSourceContentDir + "Shaders/Fragment/sprite2.cgfx";
+			const auto shader_built = gameInstallDir + "data/Shaders/Fragment/sprite2.shd";
 			if (result = eae6320::Platform::CreateDirectoryIfItDoesntExist(shader_built, &errorMessage))
 			{
 				if (result = eae6320::Platform::ExecuteCommand((std::string("\"") + path_shaderBuilder
@@ -218,7 +194,7 @@ int main( int i_argumentCount, char** i_arguments )
 		}
 #if defined( EAE6320_PLATFORM_D3D )
 		{
-			const auto shader_authored = engineSourceContentDir + "Shaders/Vertex/vertexInputLayout_geometrySprite.hlsl";
+			const auto shader_authored = engineSourceContentDir + "Shaders/Vertex/vertexInputLayout_geometrySprite.cgfx";
 			const auto shader_built = gameInstallDir + "data/Shaders/Vertex/vertexInputLayout_geometrySprite.shd";
 			if (result = eae6320::Platform::CreateDirectoryIfItDoesntExist(shader_built, &errorMessage))
 			{

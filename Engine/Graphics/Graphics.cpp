@@ -71,10 +71,13 @@ namespace
 
 	// Shading Data
 	//-------------
-	eae6320::Graphics::Effect effect;
+	eae6320::Graphics::Effect effect1;
+	eae6320::Graphics::Effect effect2;
+
 	// Geometry Data
 	//--------------
-	eae6320::Graphics::Sprite sprite;
+	eae6320::Graphics::Sprite sprite1;
+	eae6320::Graphics::Sprite sprite2;
 
 	//View Data
 	//--------------
@@ -143,11 +146,13 @@ void eae6320::Graphics::RenderFrame()
 
 	// Get the immediate context
 	view.GetContext();
-	effect.GetContext();
-	sprite.GetContext();
+	effect1.GetContext();
+	effect2.GetContext();
+	sprite1.GetContext();
+	sprite2.GetContext();
 
 	// Clear the frame
-	view.ClearColor(1.0,0.0,1.0,1.0);
+	view.ClearColor(0.5,0.0,0.0,1.0);
 
 	EAE6320_ASSERT(s_dataBeingRenderedByRenderThread);
 
@@ -158,15 +163,10 @@ void eae6320::Graphics::RenderFrame()
 		s_constantBuffer_perFrame.Update(&constantData_perFrame);
 	}
 
-	// Bind the shading data
-	{
-		effect.Bind();
-
-	}
-	// Draw the geometry
-	{
-		sprite.Draw();
-	}
+		effect1.Bind();
+		sprite1.Draw();
+		effect2.Bind();
+		//sprite2.Draw();
 }
 
 
@@ -271,10 +271,12 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	view.CleanUp();
 
 	//Clean up the sprite
-	sprite.CleanUp(result);
+	sprite1.CleanUp(result);
+	sprite2.CleanUp(result);
 
 	//Clean up the effect
-	effect.CleanUp(result);
+	effect1.CleanUp(result);
+	effect2.CleanUp(result);
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();
@@ -333,11 +335,16 @@ namespace
 {
 	eae6320::cResult InitializeGeometry()
 	{
-		return sprite.Initialize();
+		
+		auto result =  sprite1.Initialize(0.5f, 0.5f, 0.5f, 0.5f);
+		result = sprite2.Initialize(-0.5f, -0.5f, 1.0f, 1.0f);
+		return result;
 	}
 
 	eae6320::cResult InitializeShadingData()
 	{
-		return effect.Initialize();
+		auto result = effect1.Initialize("sprite", "sprite1");
+		result = effect2.Initialize("sprite", "sprite2");
+		return result;
 	}
 }

@@ -58,7 +58,9 @@ namespace eae6320
 
 			//Initialize
 			//====
-			eae6320::cResult Initialize();
+
+			//centerPosX and centerPosY define the coordinates of the center of the sprite
+			eae6320::cResult Initialize(float centerPosX, float centerPosY, float width, float height);
 
 			//Bind
 			//====
