@@ -12,7 +12,7 @@ void eae6320::Graphics::View::GetContext()
 // Initialization / Clean Up
 //--------------------------
 
-eae6320::cResult eae6320::Graphics::View::InitializeViews(const unsigned int i_resolutionWidth, const unsigned int i_resolutionHeight)
+eae6320::cResult eae6320::Graphics::View::InitializeViews(const sInitializationParameters& i_initializationParameters)
 {
 	auto result = eae6320::Results::Success;
 	
@@ -24,7 +24,7 @@ void eae6320::Graphics::View::CleanUp()
 	
 }
 
-void eae6320::Graphics::View::ClearColor()
+void eae6320::Graphics::View::ClearColor(float red, float green, float blue, float alpha)
 {
 	// Every frame an entirely new image will be created.
 	// Before drawing anything, then, the previous image will be erased
@@ -32,7 +32,7 @@ void eae6320::Graphics::View::ClearColor()
 	{
 		// Black is usually used
 		{
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClearColor(red, green, blue, alpha);
 			EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
 		}
 		{

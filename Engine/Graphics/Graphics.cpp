@@ -147,7 +147,7 @@ void eae6320::Graphics::RenderFrame()
 	sprite.GetContext();
 
 	// Clear the frame
-	view.ClearColor();
+	view.ClearColor(1.0,0.0,1.0,1.0);
 
 	EAE6320_ASSERT(s_dataBeingRenderedByRenderThread);
 
@@ -235,7 +235,7 @@ eae6320::cResult eae6320::Graphics::Initialize(const sInitializationParameters& 
 	}
 	// Initialize the views
 	{
-		if (!(result = view.InitializeViews(i_initializationParameters.resolutionWidth, i_initializationParameters.resolutionHeight)))
+		if (!(result = view.InitializeViews(i_initializationParameters)))
 		{
 			EAE6320_ASSERT(false);
 			goto OnExit;

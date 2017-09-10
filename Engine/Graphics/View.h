@@ -47,11 +47,11 @@ namespace eae6320
 			//====
 			void GetContext();
 
-			eae6320::cResult InitializeViews(const unsigned int i_resolutionWidth, const unsigned int i_resolutionHeight);
+			eae6320::cResult InitializeViews(const sInitializationParameters& i_initializationParameters);
 
 			void CleanUp();
 
-			void ClearColor();
+			void ClearColor(float red, float green, float blue, float alpha);
 
 		private:
 			// Data

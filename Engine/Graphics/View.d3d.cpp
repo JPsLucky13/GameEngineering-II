@@ -17,7 +17,7 @@ void eae6320::Graphics::View::GetContext()
 // Initialization / Clean Up
 //--------------------------
 
-eae6320::cResult eae6320::Graphics::View::InitializeViews(const unsigned int i_resolutionWidth, const unsigned int i_resolutionHeight)
+eae6320::cResult eae6320::Graphics::View::InitializeViews(const sInitializationParameters& i_initializationParameters)
 {
 	auto result = eae6320::Results::Success;
 
@@ -66,8 +66,8 @@ eae6320::cResult eae6320::Graphics::View::InitializeViews(const unsigned int i_r
 		{
 			D3D11_TEXTURE2D_DESC textureDescription{};
 			{
-				textureDescription.Width = i_resolutionWidth;
-				textureDescription.Height = i_resolutionHeight;
+				textureDescription.Width = i_initializationParameters.resolutionWidth;
+				textureDescription.Height = i_initializationParameters.resolutionHeight;
 				textureDescription.MipLevels = 1;	// A depth buffer has no MIP maps
 				textureDescription.ArraySize = 1;
 				textureDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;	// 24 bits for depth and 8 bits for stencil
@@ -118,8 +118,8 @@ eae6320::cResult eae6320::Graphics::View::InitializeViews(const unsigned int i_r
 		D3D11_VIEWPORT viewPort{};
 		{
 			viewPort.TopLeftX = viewPort.TopLeftY = 0.0f;
-			viewPort.Width = static_cast<float>(i_resolutionWidth);
-			viewPort.Height = static_cast<float>(i_resolutionHeight);
+			viewPort.Width = static_cast<float>(i_initializationParameters.resolutionWidth);
+			viewPort.Height = static_cast<float>(i_initializationParameters.resolutionHeight);
 			viewPort.MinDepth = 0.0f;
 			viewPort.MaxDepth = 1.0f;
 		}
@@ -159,7 +159,7 @@ void eae6320::Graphics::View::CleanUp()
 	}
 }
 
-void eae6320::Graphics::View::ClearColor()
+void eae6320::Graphics::View::ClearColor(float red, float green, float blue, float alpha)
 {
 
 	// Every frame an entirely new image will be created.
@@ -169,7 +169,7 @@ void eae6320::Graphics::View::ClearColor()
 		EAE6320_ASSERT(m_renderTargetView);
 
 		// Black is usually used
-		constexpr float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		float clearColor[4] = { red, green, blue, alpha };
 		m_direct3dContext->ClearRenderTargetView(m_renderTargetView, clearColor);
 	}
 }
