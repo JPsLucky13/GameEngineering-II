@@ -48,23 +48,23 @@
     <ClCompile Include="cShader.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="sContext.cpp" />
-    <ClCompile Include="Effect.d3d.cpp">
-      <Filter>Direct3D</Filter>
-    </ClCompile>
-    <ClCompile Include="Effect.gl.cpp">
-      <Filter>OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprite.d3d.cpp">
-      <Filter>Direct3D</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprite.gl.cpp">
-      <Filter>OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="Effect.cpp" />
-    <ClCompile Include="View.d3d.cpp">
+    <ClCompile Include="Direct3D\Effect.d3d.cpp">
       <Filter>Direct3D</Filter>
     </ClCompile>
-    <ClCompile Include="View.gl.cpp">
+    <ClCompile Include="Direct3D\Sprite.d3d.cpp">
+      <Filter>Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Direct3D\View.d3d.cpp">
+      <Filter>Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Effect.gl.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Sprite.gl.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGL\View.gl.cpp">
       <Filter>OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
@@ -87,9 +87,9 @@
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="sContext.h" />
     <ClInclude Include="VertexFormats.h" />
-    <ClInclude Include="Effect.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="View.h" />
+    <ClInclude Include="Effect.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cRenderState.inl" />

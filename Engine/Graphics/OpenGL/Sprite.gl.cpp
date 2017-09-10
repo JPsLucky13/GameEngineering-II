@@ -1,7 +1,5 @@
-#include "Sprite.h"
-#include "..//Graphics//Direct3D/Includes.h"
-#include "sContext.h"
-#include "../Graphics/VertexFormats.h"
+#include "../Sprite.h"
+#include "../VertexFormats.h"
 
 
 #include <Engine\Asserts\Asserts.h>
@@ -76,8 +74,8 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize(float centerPosX, float c
 	}
 	// Assign the data to the buffer
 	{
-		constexpr unsigned int triangleCount = 2;
-		constexpr unsigned int vertexCountPerTriangle = 3;
+		constexpr unsigned int triangleCount = 1;
+		constexpr unsigned int vertexCountPerTriangle = 4;
 		const auto vertexCount = triangleCount * vertexCountPerTriangle;
 		eae6320::Graphics::VertexFormats::sSprite vertexData[vertexCount];
 		{
@@ -90,14 +88,8 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize(float centerPosX, float c
 			vertexData[2].x = centerPosX - width * 0.5f;
 			vertexData[2].y = centerPosY + height * 0.5f;
 
-			vertexData[3].x = centerPosX - width * 0.5f;
+			vertexData[3].x = centerPosX + width * 0.5f;
 			vertexData[3].y = centerPosY + height * 0.5f;
-
-			vertexData[4].x = centerPosX + width * 0.5f;
-			vertexData[4].y = centerPosY - height * 0.5f;
-
-			vertexData[5].x = centerPosX + width * 0.5f;
-			vertexData[5].y = centerPosY + height * 0.5f;
 		}
 		const auto bufferSize = vertexCount * sizeof(eae6320::Graphics::VertexFormats::sSprite);
 		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
@@ -175,35 +167,19 @@ void eae6320::Graphics::Sprite::Draw()
 			// The mode defines how to interpret multiple vertices as a single "primitive";
 			// a triangle list is defined
 			// (meaning that every primitive is a triangle and will be defined by three vertices)
-			constexpr GLenum mode = GL_TRIANGLES;
+			constexpr GLenum mode = GL_TRIANGLE_STRIP;
 			// It's possible to start rendering primitives in the middle of the stream
 			constexpr GLint indexOfFirstVertexToRender = 0;
 			// As of this comment we are only drawing a single triangle
 			// (you will have to update this code in future assignments!)
-			constexpr unsigned int triangleCount = 2;
-			constexpr unsigned int vertexCountPerTriangle = 3;
+			constexpr unsigned int triangleCount = 1;
+			constexpr unsigned int vertexCountPerTriangle = 4;
 			constexpr auto vertexCountToRender = triangleCount * vertexCountPerTriangle;
 			glDrawArrays(mode, indexOfFirstVertexToRender, vertexCountToRender);
 			EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
 		}
 
-		// Everything has been drawn to the "back buffer", which is just an image in memory.
-		// In order to display it the contents of the back buffer must be "presented"
-		// (or "swapped" with the "front buffer")
-		{
-			const auto deviceContext = sContext::g_context.deviceContext;
-			EAE6320_ASSERT(deviceContext != NULL);
-
-			const auto glResult = SwapBuffers(deviceContext);
-			EAE6320_ASSERT(glResult != FALSE);
-		}
-
-		// Once everything has been drawn the data that was submitted for this frame
-		// should be cleaned up and cleared.
-		// so that the struct can be re-used (i.e. so that data for a new frame can be submitted to it)
-		{
-			// (At this point in the class there isn't anything that needs to be cleaned up)
-		}
+		
 	}
 }
 

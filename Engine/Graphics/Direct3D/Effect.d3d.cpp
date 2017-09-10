@@ -1,6 +1,6 @@
-#include "Effect.h"
-#include "..//Graphics//Direct3D/Includes.h"
-#include "sContext.h"
+#include "../Effect.h"
+#include "Includes.h"
+#include "../sContext.h"
 
 
 #include <Engine\Asserts\Asserts.h>
@@ -14,7 +14,6 @@ void eae6320::Graphics::Effect::GetContext()
 	EAE6320_ASSERT(direct3dImmediateContext);
 	m_direct3dContext = direct3dImmediateContext;
 }
-
 
 // Initialization / Clean Up
 //--------------------------
@@ -39,7 +38,7 @@ void eae6320::Graphics::Effect::Bind()
 			m_direct3dContext->PSSetShader(shader->m_shaderObject.fragment, noInterfaces, interfaceCount);
 		}
 	}
-	m_renderState.Bind();
+	BindRenderState();
 
 
 }

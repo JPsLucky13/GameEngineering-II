@@ -55,6 +55,11 @@ OnExit:
 
 }
 
+void eae6320::Graphics::Effect::BindRenderState()
+{
+	m_renderState.Bind();
+}
+
 void eae6320::Graphics::Effect::CleanUp(eae6320::cResult & result)
 {
 

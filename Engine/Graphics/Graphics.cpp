@@ -78,6 +78,7 @@ namespace
 	//--------------
 	eae6320::Graphics::Sprite sprite1;
 	eae6320::Graphics::Sprite sprite2;
+	eae6320::Graphics::Sprite sprite3;
 
 	//View Data
 	//--------------
@@ -150,6 +151,7 @@ void eae6320::Graphics::RenderFrame()
 	effect2.GetContext();
 	sprite1.GetContext();
 	sprite2.GetContext();
+	sprite3.GetContext();
 
 	// Clear the frame
 	view.ClearColor(0.5,0.0,0.0,1.0);
@@ -163,10 +165,18 @@ void eae6320::Graphics::RenderFrame()
 		s_constantBuffer_perFrame.Update(&constantData_perFrame);
 	}
 
+	//Bind effects and draw sprites
+	{
 		effect1.Bind();
 		sprite1.Draw();
 		effect2.Bind();
-		//sprite2.Draw();
+		sprite2.Draw();
+		effect1.Bind();
+		sprite3.Draw();
+	}
+
+	//Swap the buffers
+	view.ViewSwapBuffers();
 }
 
 
@@ -273,6 +283,7 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	//Clean up the sprite
 	sprite1.CleanUp(result);
 	sprite2.CleanUp(result);
+	sprite3.CleanUp(result);
 
 	//Clean up the effect
 	effect1.CleanUp(result);
@@ -338,6 +349,7 @@ namespace
 		
 		auto result =  sprite1.Initialize(0.5f, 0.5f, 0.5f, 0.5f);
 		result = sprite2.Initialize(-0.5f, -0.5f, 1.0f, 1.0f);
+		result = sprite3.Initialize(-0.5f, 0.5f, 0.25f, 0.25f);
 		return result;
 	}
 
