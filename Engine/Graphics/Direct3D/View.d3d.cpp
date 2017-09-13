@@ -5,15 +5,6 @@
 
 #include <Engine\Asserts\Asserts.h>
 
-// Implementation
-//===============
-void eae6320::Graphics::View::GetContext()
-{
-	auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
-	EAE6320_ASSERT(direct3dImmediateContext);
-	m_direct3dContext = direct3dImmediateContext;
-}
-
 // Initialization / Clean Up
 //--------------------------
 
@@ -170,7 +161,9 @@ void eae6320::Graphics::View::ClearColor(float red, float green, float blue, flo
 
 		// Black is usually used
 		float clearColor[4] = { red, green, blue, alpha };
-		m_direct3dContext->ClearRenderTargetView(m_renderTargetView, clearColor);
+		auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+		EAE6320_ASSERT(direct3dImmediateContext);
+		direct3dImmediateContext->ClearRenderTargetView(m_renderTargetView, clearColor);
 	}
 }
 

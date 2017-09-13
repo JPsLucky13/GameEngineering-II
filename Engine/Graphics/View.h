@@ -40,7 +40,6 @@ namespace eae6320
 
 			// Functions
 			//====
-			void GetContext();
 
 			eae6320::cResult InitializeViews(const sInitializationParameters& i_initializationParameters);
 

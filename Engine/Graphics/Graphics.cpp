@@ -146,7 +146,6 @@ void eae6320::Graphics::RenderFrame()
 	}
 
 	// Get the immediate context
-	view.GetContext();
 	effect1.GetContext();
 	effect2.GetContext();
 	sprite1.GetContext();
@@ -355,8 +354,8 @@ namespace
 
 	eae6320::cResult InitializeShadingData()
 	{
-		auto result = effect1.Initialize("sprite", "sprite1");
-		result = effect2.Initialize("sprite", "sprite2");
+		auto result = effect1.Initialize("sprite", "sprite1",eae6320::Graphics::RenderStates::AlphaTransparency);
+		result = effect2.Initialize("sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
 		return result;
 	}
 }
