@@ -1,14 +1,6 @@
 #include "../View.h"
 #include "Includes.h"
 
-// Implementation
-//===============
-
-void eae6320::Graphics::View::GetContext()
-{
-
-}
-
 // Initialization / Clean Up
 //--------------------------
 

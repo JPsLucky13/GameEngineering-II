@@ -50,7 +50,7 @@ namespace eae6320
 
 			//Initialize
 			//====
-			eae6320::cResult Initialize(char * vertexShaderName, char * fragmentShaderName);
+			eae6320::cResult Initialize(char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState);
 
 			//Bind
 			//====

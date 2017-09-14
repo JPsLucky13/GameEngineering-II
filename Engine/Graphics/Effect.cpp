@@ -10,7 +10,7 @@
 
 // Initialization / Clean Up
 //--------------------------
-eae6320::cResult eae6320::Graphics::Effect::Initialize(char * vertexShaderName, char * fragmentShaderName)
+eae6320::cResult eae6320::Graphics::Effect::Initialize(char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState)
 {
 	auto result = eae6320::Results::Success;
 
@@ -39,7 +39,6 @@ eae6320::cResult eae6320::Graphics::Effect::Initialize(char * vertexShaderName, 
 		goto OnExit;
 	}
 	{
-		constexpr uint8_t defaultRenderState = 0;
 		if (!(result = m_renderState.Initialize(defaultRenderState)))
 		{
 			EAE6320_ASSERT(false);
