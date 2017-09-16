@@ -72,6 +72,11 @@ namespace eae6320
 
 		virtual void UpdateBasedOnInput() override;
 
+		// Submit render data
+
+		virtual void SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate) override;
+
+
 		// Initialization / Clean Up
 		//--------------------------
 

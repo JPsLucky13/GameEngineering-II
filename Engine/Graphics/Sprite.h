@@ -19,6 +19,7 @@ This file declares the external interface for the effect
 
 #include <cstdint>
 #include <Engine/Results/Results.h>
+#include <Engine/Assets/ReferenceCountedAssets.h>
 
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
@@ -32,12 +33,16 @@ namespace eae6320
 {
 	namespace Graphics
 	{
-		struct Sprite
+		class Sprite
 		{
 			// Interface
 			//==========
 
 		public:
+
+			EAE6320_ASSETS_DECLAREREFERENCECOUNTINGFUNCTIONS()
+
+			EAE6320_ASSETS_DECLAREDELETEDREFERENCECOUNTEDFUNCTIONS(Sprite)
 
 			// Data
 			//=====
@@ -45,31 +50,21 @@ namespace eae6320
 			// Functions
 			//====
 
-			// Get
+			//Factory
 			//====
-			void GetContext();
-
-			//Initialize
-			//====
-
-			//centerPosX and centerPosY define the coordinates of the center of the sprite
-			eae6320::cResult Initialize(float centerPosX, float centerPosY, float width, float height);
+			static cResult Factory(Sprite* &o_sprite, float centerPosX, float centerPosY, float width, float height);
 
 			//Bind
 			//====
 			void Draw();
-
-			//CleanUp
-			//====
-			void CleanUp(eae6320::cResult & result);
 
 
 		private:
 
 			//Data
 			//====
+
 #if defined( EAE6320_PLATFORM_D3D )
-			ID3D11DeviceContext* m_direct3dContext;
 			// A vertex buffer holds the data for each vertex
 			ID3D11Buffer* m_vertexBuffer = nullptr;
 			// D3D has an "input layout" object that associates the layout of the vertex format struct
@@ -83,6 +78,20 @@ namespace eae6320
 			// A vertex array encapsulates the vertex data as well as the vertex input layout
 			GLuint m_vertexArrayId = 0;
 #endif
+			EAE6320_ASSETS_DECLAREREFERENCECOUNT()
+
+			//Constructor
+			Sprite();
+
+			//Destructor
+			~Sprite();
+
+			//Initialize and CleanUp
+			//====
+
+			//centerPosX and centerPosY define the coordinates of the center of the sprite
+			eae6320::cResult Initialize(float centerPosX, float centerPosY, float width, float height);
+			eae6320::cResult CleanUp();
 
 		};
 	}

@@ -7,9 +7,6 @@
 
 // Implementation
 //===============
-void eae6320::Graphics::Effect::GetContext()
-{
-}
 
 // Initialization / Clean Up
 //--------------------------

@@ -15,6 +15,7 @@ This file declares the external interface for the effect
 
 #include <cstdint>
 #include <Engine/Results/Results.h>
+#include <Engine/Assets/ReferenceCountedAssets.h>
 
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
@@ -28,12 +29,17 @@ namespace eae6320
 {
 	namespace Graphics
 	{
-		struct Effect
+		class Effect
 		{
 			// Interface
 			//==========
 
 		public:
+
+			EAE6320_ASSETS_DECLAREREFERENCECOUNTINGFUNCTIONS()
+
+
+			EAE6320_ASSETS_DECLAREDELETEDREFERENCECOUNTEDFUNCTIONS(Effect);
 
 			// Data
 			//=====
@@ -41,16 +47,12 @@ namespace eae6320
 
 
 
-
 			// Functions
 			//====
 
-			//Set Context
-			void GetContext();
-
 			//Initialize
 			//====
-			eae6320::cResult Initialize(char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState);
+			static cResult Factory(Effect* &o_effect, char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState);
 
 			//Bind
 			//====
@@ -58,9 +60,7 @@ namespace eae6320
 
 			void BindRenderState();
 
-			//CleanUp
-			//====
-			void CleanUp(eae6320::cResult & result);
+			
 
 			//Create Program
 			eae6320::cResult CreateProgram(eae6320::cResult & result);
@@ -72,20 +72,28 @@ namespace eae6320
 
 			// Data
 			//=====
-#if defined( EAE6320_PLATFORM_D3D )
-			ID3D11DeviceContext* m_direct3dContext;
-#endif
 
 #if defined( EAE6320_PLATFORM_GL )
 			GLuint m_programId = 0;
 #endif
-			// Data
-			//=====
 
 			eae6320::Graphics::cShader::Handle m_vertexShader;
 			eae6320::Graphics::cShader::Handle m_fragmentShader;
 
 			eae6320::Graphics::cRenderState m_renderState;
+			EAE6320_ASSETS_DECLAREREFERENCECOUNT()
+
+			//Constructor
+			Effect();
+
+			//Destructor
+			~Effect();
+
+			//Initialize and CleanUp
+			//====
+			eae6320::cResult Initialize(char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState);
+			eae6320::cResult CleanUp();
+
 
 		};
 	}

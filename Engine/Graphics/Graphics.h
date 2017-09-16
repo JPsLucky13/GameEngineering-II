@@ -47,6 +47,8 @@ namespace eae6320
 		// Render
 		//-------
 
+		void ClearColor(float red, float green, float blue, float alpha);
+
 		// This is called (automatically) from the main/render thread.
 		// It will render a submitted frame as soon as it is ready
 		// (i.e. as soon as SignalThatAllDataForAFrameHasBeenSubmitted() has been called)

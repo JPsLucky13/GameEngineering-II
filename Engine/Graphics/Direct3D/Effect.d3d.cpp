@@ -8,13 +8,6 @@
 // Implementation
 //===============
 
-void eae6320::Graphics::Effect::GetContext()
-{
-	auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
-	EAE6320_ASSERT(direct3dImmediateContext);
-	m_direct3dContext = direct3dImmediateContext;
-}
-
 // Initialization / Clean Up
 //--------------------------
 
@@ -28,14 +21,18 @@ void eae6320::Graphics::Effect::Bind()
 			EAE6320_ASSERT(m_vertexShader);
 			auto* const shader = cShader::s_manager.Get(m_vertexShader);
 			EAE6320_ASSERT(shader && shader->m_shaderObject.vertex);
-			m_direct3dContext->VSSetShader(shader->m_shaderObject.vertex, noInterfaces, interfaceCount);
+			auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+			EAE6320_ASSERT(direct3dImmediateContext);
+			direct3dImmediateContext->VSSetShader(shader->m_shaderObject.vertex, noInterfaces, interfaceCount);
 		}
 		// Fragment shader
 		{
 			EAE6320_ASSERT(m_fragmentShader);
 			auto* const shader = cShader::s_manager.Get(m_fragmentShader);
 			EAE6320_ASSERT(shader && shader->m_shaderObject.fragment);
-			m_direct3dContext->PSSetShader(shader->m_shaderObject.fragment, noInterfaces, interfaceCount);
+			auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+			EAE6320_ASSERT(direct3dImmediateContext);
+			direct3dImmediateContext->PSSetShader(shader->m_shaderObject.fragment, noInterfaces, interfaceCount);
 		}
 	}
 	BindRenderState();

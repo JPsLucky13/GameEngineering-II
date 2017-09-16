@@ -51,6 +51,12 @@ namespace
 	struct sDataRequiredToRenderAFrame
 	{
 		eae6320::Graphics::ConstantBufferFormats::sPerFrame constantData_perFrame;
+		
+		//ColorData
+		float red;
+		float green;
+		float blue;
+		float alpha;
 	};
 	// In our class there will be two copies of the data required to render a frame:
 	//	* One of them will be getting populated by the data currently being submitted by the application loop thread
@@ -97,7 +103,6 @@ void eae6320::Graphics::SubmitElapsedTime(const float i_elapsedSecondCount_syste
 	auto& constantData_perFrame = s_dataBeingSubmittedByApplicationThread->constantData_perFrame;
 	constantData_perFrame.g_elapsedSecondCount_systemTime = i_elapsedSecondCount_systemTime;
 	constantData_perFrame.g_elapsedSecondCount_simulationTime = i_elapsedSecondCount_simulationTime;
-
 }
 
 eae6320::cResult eae6320::Graphics::WaitUntilDataForANewFrameCanBeSubmitted(const unsigned int i_timeToWait_inMilliseconds)
@@ -113,6 +118,17 @@ eae6320::cResult eae6320::Graphics::SignalThatAllDataForAFrameHasBeenSubmitted()
 
 // Render
 //-------
+void eae6320::Graphics::ClearColor(float red, float green, float blue, float alpha)
+{
+	//Colors to clear the screen
+	s_dataBeingSubmittedByApplicationThread->red = red;
+	s_dataBeingSubmittedByApplicationThread->green = green;
+	s_dataBeingSubmittedByApplicationThread->blue = blue;
+	s_dataBeingSubmittedByApplicationThread->alpha = alpha;
+
+	
+}
+
 
 void eae6320::Graphics::RenderFrame()
 {
@@ -145,16 +161,6 @@ void eae6320::Graphics::RenderFrame()
 		}
 	}
 
-	// Get the immediate context
-	effect1.GetContext();
-	effect2.GetContext();
-	sprite1.GetContext();
-	sprite2.GetContext();
-	sprite3.GetContext();
-
-	// Clear the frame
-	view.ClearColor(0.5,0.0,0.0,1.0);
-
 	EAE6320_ASSERT(s_dataBeingRenderedByRenderThread);
 
 	// Update the per-frame constant buffer
@@ -162,6 +168,14 @@ void eae6320::Graphics::RenderFrame()
 		// Copy the data from the system memory that the application owns to GPU memory
 		auto& constantData_perFrame = s_dataBeingRenderedByRenderThread->constantData_perFrame;
 		s_constantBuffer_perFrame.Update(&constantData_perFrame);
+	}
+
+	//Clear the screen with color 
+	{
+		// Clear the frame
+		view.ClearColor(s_dataBeingRenderedByRenderThread->red, s_dataBeingRenderedByRenderThread->green,
+			s_dataBeingRenderedByRenderThread->blue, s_dataBeingRenderedByRenderThread->alpha);
+
 	}
 
 	//Bind effects and draw sprites
@@ -279,14 +293,14 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	//Clean up the view object
 	view.CleanUp();
 
-	//Clean up the sprite
-	sprite1.CleanUp(result);
-	sprite2.CleanUp(result);
-	sprite3.CleanUp(result);
+	////Clean up the sprite
+	//sprite1.CleanUp();
+	//sprite2.CleanUp();
+	//sprite3.CleanUp();
 
-	//Clean up the effect
-	effect1.CleanUp(result);
-	effect2.CleanUp(result);
+	////Clean up the effect
+	//effect1.CleanUp();
+	//effect2.CleanUp();
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();
@@ -346,16 +360,16 @@ namespace
 	eae6320::cResult InitializeGeometry()
 	{
 		
-		auto result =  sprite1.Initialize(0.5f, 0.5f, 0.5f, 0.5f);
-		result = sprite2.Initialize(-0.5f, -0.5f, 1.0f, 1.0f);
-		result = sprite3.Initialize(-0.5f, 0.5f, 0.25f, 0.25f);
-		return result;
+		//auto result = Results::Success;/*sprite1.Initialize(0.5f, 0.5f, 0.5f, 0.5f);
+		//result = sprite2.Initialize(-0.5f, -0.5f, 1.0f, 1.0f);
+		//result = sprite3.Initialize(-0.5f, 0.5f, 0.25f, 0.25f);*/
+		//return result;
 	}
 
 	eae6320::cResult InitializeShadingData()
 	{
-		auto result = effect1.Initialize("sprite", "sprite1",eae6320::Graphics::RenderStates::AlphaTransparency);
+		/*auto result = effect1.Initialize("sprite", "sprite1",eae6320::Graphics::RenderStates::AlphaTransparency);
 		result = effect2.Initialize("sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
-		return result;
+		return result;*/
 	}
 }

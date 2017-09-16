@@ -5,6 +5,8 @@
 
 #include <Engine/Asserts/Asserts.h>
 #include <Engine/UserInput/UserInput.h>
+#include <Engine/Graphics/Graphics.h>
+
 
 // Inherited Implementation
 //=========================
@@ -21,10 +23,12 @@ void eae6320::cExampleGame::UpdateBasedOnInput()
 		const auto result = Exit( EXIT_SUCCESS );
 		EAE6320_ASSERT( result );
 	}
+}
 
-	
-	
-
+void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate)
+{
+	//User specify's the background clear color
+	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
 }
 
 // Initialization / Clean Up

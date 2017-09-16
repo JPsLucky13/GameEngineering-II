@@ -10,13 +10,6 @@
 // Implementation
 //===============
 
-void eae6320::Graphics::Sprite::GetContext()
-{
-	auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
-	EAE6320_ASSERT(direct3dImmediateContext);
-	m_direct3dContext = direct3dImmediateContext;
-}
-
 
 // Initialization / Clean Up
 //--------------------------
@@ -145,19 +138,27 @@ void eae6320::Graphics::Sprite::Draw()
 		constexpr unsigned int bufferStride = sizeof(VertexFormats::sSprite);
 		// It's possible to start streaming data in the middle of a vertex buffer
 		constexpr unsigned int bufferOffset = 0;
-		m_direct3dContext->IASetVertexBuffers(startingSlot, vertexBufferCount, &m_vertexBuffer, &bufferStride, &bufferOffset);
+
+		auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+		EAE6320_ASSERT(direct3dImmediateContext);
+
+		direct3dImmediateContext->IASetVertexBuffers(startingSlot, vertexBufferCount, &m_vertexBuffer, &bufferStride, &bufferOffset);
 	}
 	// Specify what kind of data the vertex buffer holds
 	{
 		// Set the layout (which defines how to interpret a single vertex)
 		{
 			EAE6320_ASSERT(m_vertexInputLayout);
-			m_direct3dContext->IASetInputLayout(m_vertexInputLayout);
+			auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+			EAE6320_ASSERT(direct3dImmediateContext);
+			direct3dImmediateContext->IASetInputLayout(m_vertexInputLayout);
 		}
 		// Set the topology (which defines how to interpret multiple vertices as a single "primitive";
 		// the vertex buffer was defined as a triangle list
 		// (meaning that every primitive is a triangle and will be defined by three vertices)
-		m_direct3dContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+		EAE6320_ASSERT(direct3dImmediateContext);
+		direct3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	}
 	// Render triangles from the currently-bound vertex buffer
 	{
@@ -168,14 +169,18 @@ void eae6320::Graphics::Sprite::Draw()
 		constexpr auto vertexCountToRender = triangleCount * vertexCountPerTriangle;
 		// It's possible to start rendering primitives in the middle of the stream
 		constexpr unsigned int indexOfFirstVertexToRender = 0;
-		m_direct3dContext->Draw(vertexCountToRender, indexOfFirstVertexToRender);
+		auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+		EAE6320_ASSERT(direct3dImmediateContext);
+		direct3dImmediateContext->Draw(vertexCountToRender, indexOfFirstVertexToRender);
 	}
 	
 }
 
 
-void eae6320::Graphics::Sprite::CleanUp(eae6320::cResult & result)
+eae6320::cResult eae6320::Graphics::Sprite::CleanUp()
 {
+	auto result = Results::Success;
+
 	if (m_vertexBuffer)
 	{
 		m_vertexBuffer->Release();
@@ -186,4 +191,16 @@ void eae6320::Graphics::Sprite::CleanUp(eae6320::cResult & result)
 		m_vertexInputLayout->Release();
 		m_vertexInputLayout = nullptr;
 	}
+
+	return result;
+}
+
+eae6320::Graphics::Sprite::Sprite()
+{
+
+}
+
+eae6320::Graphics::Sprite::~Sprite()
+{
+	CleanUp();
 }
