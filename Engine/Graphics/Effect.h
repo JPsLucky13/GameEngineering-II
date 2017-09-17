@@ -2,6 +2,9 @@
 This file declares the external interface for the effect
 */
 
+#ifndef EAE6320_GRAPHICS_EFFECT_H
+#define EAE6320_GRAPHICS_EFFECT_H
+
 // Include Files
 //==============
 #include "cShader.h"
@@ -11,7 +14,7 @@ This file declares the external interface for the effect
 #include "OpenGL\Includes.h"
 #endif
 
-#include "sContext.h"
+
 
 #include <cstdint>
 #include <Engine/Results/Results.h>
@@ -35,11 +38,11 @@ namespace eae6320
 			//==========
 
 		public:
-
-			EAE6320_ASSETS_DECLAREREFERENCECOUNTINGFUNCTIONS()
-
-
 			EAE6320_ASSETS_DECLAREDELETEDREFERENCECOUNTEDFUNCTIONS(Effect);
+
+			EAE6320_ASSETS_DECLAREREFERENCECOUNTINGFUNCTIONS();
+
+
 
 			// Data
 			//=====
@@ -60,7 +63,6 @@ namespace eae6320
 
 			void BindRenderState();
 
-			
 
 			//Create Program
 			eae6320::cResult CreateProgram(eae6320::cResult & result);
@@ -81,7 +83,12 @@ namespace eae6320
 			eae6320::Graphics::cShader::Handle m_fragmentShader;
 
 			eae6320::Graphics::cRenderState m_renderState;
-			EAE6320_ASSETS_DECLAREREFERENCECOUNT()
+			EAE6320_ASSETS_DECLAREREFERENCECOUNT();
+
+			//Initialize and CleanUp
+			//====
+			eae6320::cResult Initialize(char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState);
+			eae6320::cResult CleanUp();
 
 			//Constructor
 			Effect();
@@ -89,14 +96,8 @@ namespace eae6320
 			//Destructor
 			~Effect();
 
-			//Initialize and CleanUp
-			//====
-			eae6320::cResult Initialize(char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState);
-			eae6320::cResult CleanUp();
-
-
 		};
 	}
 }
 
-
+#endif	// EAE6320_GRAPHICS_EFFECT_H

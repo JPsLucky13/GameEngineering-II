@@ -2,10 +2,11 @@
 This file declares the external interface for the effect
 */
 
+#ifndef EAE6320_GRAPHICS_SPRITE_H
+#define EAE6320_GRAPHICS_SPRITE_H
+
 // Include Files
 //==============
-#include "cShader.h"
-#include "cRenderState.h"
 
 #if defined( EAE6320_PLATFORM_GL )
 #include "OpenGL\Includes.h"
@@ -14,8 +15,6 @@ This file declares the external interface for the effect
 #if defined( EAE6320_PLATFORM_D3D )
 #include "Direct3D\Includes.h"
 #endif
-
-#include "sContext.h"
 
 #include <cstdint>
 #include <Engine/Results/Results.h>
@@ -40,9 +39,10 @@ namespace eae6320
 
 		public:
 
-			EAE6320_ASSETS_DECLAREREFERENCECOUNTINGFUNCTIONS()
+			EAE6320_ASSETS_DECLAREDELETEDREFERENCECOUNTEDFUNCTIONS(Sprite);
+			
+			EAE6320_ASSETS_DECLAREREFERENCECOUNTINGFUNCTIONS();
 
-			EAE6320_ASSETS_DECLAREDELETEDREFERENCECOUNTEDFUNCTIONS(Sprite)
 
 			// Data
 			//=====
@@ -78,13 +78,7 @@ namespace eae6320
 			// A vertex array encapsulates the vertex data as well as the vertex input layout
 			GLuint m_vertexArrayId = 0;
 #endif
-			EAE6320_ASSETS_DECLAREREFERENCECOUNT()
-
-			//Constructor
-			Sprite();
-
-			//Destructor
-			~Sprite();
+			EAE6320_ASSETS_DECLAREREFERENCECOUNT();
 
 			//Initialize and CleanUp
 			//====
@@ -93,8 +87,18 @@ namespace eae6320
 			eae6320::cResult Initialize(float centerPosX, float centerPosY, float width, float height);
 			eae6320::cResult CleanUp();
 
+
+			//Constructor
+			Sprite();
+
+			//Destructor
+			~Sprite();
+
+			
+
 		};
 	}
 }
 
+#endif	// EAE6320_GRAPHICS_SPRITE_H
 

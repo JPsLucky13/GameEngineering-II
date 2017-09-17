@@ -11,8 +11,6 @@
 #include "cShader.h"
 #include "sContext.h"
 #include "VertexFormats.h"
-#include "Effect.h"
-#include "Sprite.h"
 #include "View.h"
 
 #include <Engine/Asserts/Asserts.h>
@@ -57,6 +55,13 @@ namespace
 		float green;
 		float blue;
 		float alpha;
+
+		//Effect
+		std::vector<eae6320::Graphics::Effect> effects;
+
+		//Sprite
+		std::vector<eae6320::Graphics::Sprite> sprites;
+
 	};
 	// In our class there will be two copies of the data required to render a frame:
 	//	* One of them will be getting populated by the data currently being submitted by the application loop thread
@@ -74,17 +79,6 @@ namespace
 	// and the application loop thread can start submitting data for the following frame
 	// (the application loop thread waits for the signal)
 	eae6320::Concurrency::cEvent s_whenDataForANewFrameCanBeSubmittedFromApplicationThread;
-
-	// Shading Data
-	//-------------
-	eae6320::Graphics::Effect effect1;
-	eae6320::Graphics::Effect effect2;
-
-	// Geometry Data
-	//--------------
-	eae6320::Graphics::Sprite sprite1;
-	eae6320::Graphics::Sprite sprite2;
-	eae6320::Graphics::Sprite sprite3;
 
 	//View Data
 	//--------------
@@ -128,6 +122,16 @@ void eae6320::Graphics::ClearColor(float red, float green, float blue, float alp
 
 	
 }
+
+//void eae6320::Graphics::RenderSpriteWithEffect(Sprite & sprite, Effect & effect, uint8_t numberOfPairs)
+//{
+//	for (size_t i = 0; i < numberOfPairs; i++)
+//	{
+//		s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
+//		s_dataBeingSubmittedByApplicationThread->sprites.push_back(sprite);
+//	}
+//	
+//}
 
 
 void eae6320::Graphics::RenderFrame()
@@ -180,16 +184,27 @@ void eae6320::Graphics::RenderFrame()
 
 	//Bind effects and draw sprites
 	{
-		effect1.Bind();
-		sprite1.Draw();
-		effect2.Bind();
-		sprite2.Draw();
-		effect1.Bind();
-		sprite3.Draw();
+		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
+		{
+			s_dataBeingRenderedByRenderThread->effects[i].Bind();
+			s_dataBeingRenderedByRenderThread->sprites[i].Draw();
+		}
 	}
 
 	//Swap the buffers
 	view.ViewSwapBuffers();
+
+	//Reset the arbitrary number of sprites and effects
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
+	{
+		s_dataBeingRenderedByRenderThread->effects[i].DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->sprites[i].DecrementReferenceCount();
+	}
+
+	//Clear the arbitrary number of sprites and effects
+	s_dataBeingRenderedByRenderThread->effects.clear();
+	s_dataBeingRenderedByRenderThread->sprites.clear();
+
 }
 
 
@@ -293,14 +308,16 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	//Clean up the view object
 	view.CleanUp();
 
-	////Clean up the sprite
-	//sprite1.CleanUp();
-	//sprite2.CleanUp();
-	//sprite3.CleanUp();
+	//Reset the arbitrary number of sprites and effects
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
+	{
+		s_dataBeingRenderedByRenderThread->effects[i].DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->sprites[i].DecrementReferenceCount();
+	}
 
-	////Clean up the effect
-	//effect1.CleanUp();
-	//effect2.CleanUp();
+	//Clear the arbitrary number of sprites and effects
+	s_dataBeingRenderedByRenderThread->effects.clear();
+	s_dataBeingRenderedByRenderThread->sprites.clear();
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();

@@ -9,6 +9,8 @@
 //==============
 
 #include "Configuration.h"
+#include "Effect.h"
+#include "Sprite.h"
 
 #include <cstdint>
 #include <Engine/Results/Results.h>
@@ -53,6 +55,9 @@ namespace eae6320
 		// It will render a submitted frame as soon as it is ready
 		// (i.e. as soon as SignalThatAllDataForAFrameHasBeenSubmitted() has been called)
 		void RenderFrame();
+
+		//void RenderSpriteWithEffect(Sprite & sprite, Effect & effect, uint8_t numberOfPairs);
+
 
 		// Initialization / Clean Up
 		//--------------------------

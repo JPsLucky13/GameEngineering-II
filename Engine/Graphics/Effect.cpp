@@ -7,7 +7,7 @@
 // Implementation
 //===============
 
-eae6320::cResult eae6320::Graphics::Effect::Factory(Effect* &o_effect, char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState)
+eae6320::cResult eae6320::Graphics::Effect::Factory(eae6320::Graphics::Effect* &o_effect, char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState)
 {
 	auto result = Results::Success;
 
@@ -15,7 +15,7 @@ eae6320::cResult eae6320::Graphics::Effect::Factory(Effect* &o_effect, char * ve
 
 	// Allocate a new effect
 	{
-		newEffect = new (std::nothrow) Effect();
+		newEffect = new Effect();
 		if (!newEffect)
 		{
 			result = Results::OutOfMemory;
@@ -148,6 +148,8 @@ eae6320::cResult eae6320::Graphics::Effect::CleanUp()
 		}
 	}
 
+	this->DecrementReferenceCount();
+
 	return result;
 }
 
@@ -160,4 +162,3 @@ eae6320::Graphics::Effect::~Effect()
 {
 	CleanUp();
 }
-

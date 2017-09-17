@@ -18,7 +18,7 @@ eae6320::cResult eae6320::Graphics::Sprite::Factory(Sprite* &o_sprite, float cen
 
 	// Allocate a new sprite
 	{
-		newSprite = new (std::nothrow) Sprite();
+		newSprite = new Sprite();
 		if (!newSprite)
 		{
 			result = Results::OutOfMemory;
