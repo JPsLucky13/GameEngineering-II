@@ -54,6 +54,11 @@ namespace eae6320
 			//====
 			static cResult Factory(Sprite* &o_sprite, float centerPosX, float centerPosY, float width, float height);
 
+			//Delete
+			//====
+			static void Delete(Sprite* &o_sprite);
+
+
 			//Bind
 			//====
 			void Draw();
@@ -93,8 +98,6 @@ namespace eae6320
 
 			//Destructor
 			~Sprite();
-
-			
 
 		};
 	}

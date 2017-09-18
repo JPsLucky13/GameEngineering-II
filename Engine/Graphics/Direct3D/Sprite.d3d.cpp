@@ -194,13 +194,3 @@ eae6320::cResult eae6320::Graphics::Sprite::CleanUp()
 
 	return result;
 }
-
-eae6320::Graphics::Sprite::Sprite()
-{
-
-}
-
-eae6320::Graphics::Sprite::~Sprite()
-{
-	CleanUp();
-}

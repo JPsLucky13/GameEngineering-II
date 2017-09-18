@@ -47,15 +47,16 @@ namespace eae6320
 			// Data
 			//=====
 
-
-
-
 			// Functions
 			//====
 
-			//Initialize
+			//Factory
 			//====
 			static cResult Factory(Effect* &o_effect, char * vertexShaderName, char * fragmentShaderName, uint8_t defaultRenderState);
+
+			//Delete
+			//====
+			static void Delete(Effect* &o_sprite);
 
 			//Bind
 			//====
@@ -83,6 +84,7 @@ namespace eae6320
 			eae6320::Graphics::cShader::Handle m_fragmentShader;
 
 			eae6320::Graphics::cRenderState m_renderState;
+			
 			EAE6320_ASSETS_DECLAREREFERENCECOUNT();
 
 			//Initialize and CleanUp

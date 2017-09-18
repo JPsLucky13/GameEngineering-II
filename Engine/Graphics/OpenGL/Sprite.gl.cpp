@@ -3,6 +3,7 @@
 
 
 #include <Engine\Asserts\Asserts.h>
+#include <Engine\Logging\Logging.h>
 
 // Implementation
 //===============
@@ -239,12 +240,3 @@ eae6320::cResult eae6320::Graphics::Sprite::CleanUp()
 	return result;
 }
 
-eae6320::Graphics::Sprite::Sprite()
-{
-
-}
-
-eae6320::Graphics::Sprite::~Sprite()
-{
-	CleanUp();
-}

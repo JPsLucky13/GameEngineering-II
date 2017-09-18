@@ -57,10 +57,10 @@ namespace
 		float alpha;
 
 		//Effect
-		std::vector<eae6320::Graphics::Effect> effects;
+		std::vector<eae6320::Graphics::Effect *> effects;
 
 		//Sprite
-		std::vector<eae6320::Graphics::Sprite> sprites;
+		std::vector<eae6320::Graphics::Sprite *> sprites;
 
 	};
 	// In our class there will be two copies of the data required to render a frame:
@@ -123,15 +123,19 @@ void eae6320::Graphics::ClearColor(float red, float green, float blue, float alp
 	
 }
 
-//void eae6320::Graphics::RenderSpriteWithEffect(Sprite & sprite, Effect & effect, uint8_t numberOfPairs)
-//{
-//	for (size_t i = 0; i < numberOfPairs; i++)
-//	{
-//		s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
-//		s_dataBeingSubmittedByApplicationThread->sprites.push_back(sprite);
-//	}
-//	
-//}
+void eae6320::Graphics::RenderSpriteWithEffect(Sprite * sprite, Effect * effect, uint8_t numberOfPairs)
+{
+
+	for (size_t i = 0; i < numberOfPairs; i++)
+	{
+		sprite->IncrementReferenceCount();
+		effect->IncrementReferenceCount();
+
+		s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
+		s_dataBeingSubmittedByApplicationThread->sprites.push_back(sprite);
+	}
+	
+}
 
 
 void eae6320::Graphics::RenderFrame()
@@ -186,8 +190,8 @@ void eae6320::Graphics::RenderFrame()
 	{
 		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
 		{
-			s_dataBeingRenderedByRenderThread->effects[i].Bind();
-			s_dataBeingRenderedByRenderThread->sprites[i].Draw();
+			s_dataBeingRenderedByRenderThread->effects[i]->Bind();
+			s_dataBeingRenderedByRenderThread->sprites[i]->Draw();
 		}
 	}
 
@@ -197,8 +201,8 @@ void eae6320::Graphics::RenderFrame()
 	//Reset the arbitrary number of sprites and effects
 	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
 	{
-		s_dataBeingRenderedByRenderThread->effects[i].DecrementReferenceCount();
-		s_dataBeingRenderedByRenderThread->sprites[i].DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
 	}
 
 	//Clear the arbitrary number of sprites and effects
@@ -311,13 +315,24 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	//Reset the arbitrary number of sprites and effects
 	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
 	{
-		s_dataBeingRenderedByRenderThread->effects[i].DecrementReferenceCount();
-		s_dataBeingRenderedByRenderThread->sprites[i].DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
 	}
 
 	//Clear the arbitrary number of sprites and effects
 	s_dataBeingRenderedByRenderThread->effects.clear();
 	s_dataBeingRenderedByRenderThread->sprites.clear();
+
+	//Reset the arbitrary number of sprites and effects
+	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->effects.size(); i++)
+	{
+		s_dataBeingSubmittedByApplicationThread->effects[i]->DecrementReferenceCount();
+		s_dataBeingSubmittedByApplicationThread->sprites[i]->DecrementReferenceCount();
+	}
+
+	//Clear the arbitrary number of sprites and effects
+	s_dataBeingSubmittedByApplicationThread->effects.clear();
+	s_dataBeingSubmittedByApplicationThread->sprites.clear();
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();
@@ -376,17 +391,13 @@ namespace
 {
 	eae6320::cResult InitializeGeometry()
 	{
-		
-		//auto result = Results::Success;/*sprite1.Initialize(0.5f, 0.5f, 0.5f, 0.5f);
-		//result = sprite2.Initialize(-0.5f, -0.5f, 1.0f, 1.0f);
-		//result = sprite3.Initialize(-0.5f, 0.5f, 0.25f, 0.25f);*/
-		//return result;
+		auto result = eae6320::Results::Success;
+		return result;
 	}
 
 	eae6320::cResult InitializeShadingData()
 	{
-		/*auto result = effect1.Initialize("sprite", "sprite1",eae6320::Graphics::RenderStates::AlphaTransparency);
-		result = effect2.Initialize("sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
-		return result;*/
+		auto result = eae6320::Results::Success;
+		return result;
 	}
 }

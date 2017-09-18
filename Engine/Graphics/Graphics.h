@@ -56,7 +56,7 @@ namespace eae6320
 		// (i.e. as soon as SignalThatAllDataForAFrameHasBeenSubmitted() has been called)
 		void RenderFrame();
 
-		//void RenderSpriteWithEffect(Sprite & sprite, Effect & effect, uint8_t numberOfPairs);
+		void RenderSpriteWithEffect(Sprite * sprite, Effect * effect, uint8_t numberOfPairs);
 
 
 		// Initialization / Clean Up

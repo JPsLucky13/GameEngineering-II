@@ -55,3 +55,19 @@ OnExit:
 	return result;
 
 }
+
+void eae6320::Graphics::Sprite::Delete(eae6320::Graphics::Sprite* &o_sprite)
+{
+	o_sprite->DecrementReferenceCount();
+	o_sprite = nullptr;
+}
+
+eae6320::Graphics::Sprite::Sprite()
+{
+
+}
+
+eae6320::Graphics::Sprite::~Sprite()
+{
+	CleanUp();
+}

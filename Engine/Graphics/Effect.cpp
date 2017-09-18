@@ -53,6 +53,11 @@ OnExit:
 
 }
 
+void eae6320::Graphics::Effect::Delete(eae6320::Graphics::Effect* &o_effect)
+{
+	o_effect->DecrementReferenceCount();
+	o_effect = nullptr;
+}
 
 // Initialization / Clean Up
 //--------------------------
@@ -147,8 +152,6 @@ eae6320::cResult eae6320::Graphics::Effect::CleanUp()
 			}
 		}
 	}
-
-	this->DecrementReferenceCount();
 
 	return result;
 }
