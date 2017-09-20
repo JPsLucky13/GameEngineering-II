@@ -11,8 +11,6 @@
 #include "cShader.h"
 #include "sContext.h"
 #include "VertexFormats.h"
-#include "Effect.h"
-#include "Sprite.h"
 #include "View.h"
 
 #include <Engine/Asserts/Asserts.h>
@@ -51,6 +49,19 @@ namespace
 	struct sDataRequiredToRenderAFrame
 	{
 		eae6320::Graphics::ConstantBufferFormats::sPerFrame constantData_perFrame;
+		
+		//ColorData
+		float red;
+		float green;
+		float blue;
+		float alpha;
+
+		//Effect
+		std::vector<eae6320::Graphics::Effect *> effects;
+
+		//Sprite
+		std::vector<eae6320::Graphics::Sprite *> sprites;
+
 	};
 	// In our class there will be two copies of the data required to render a frame:
 	//	* One of them will be getting populated by the data currently being submitted by the application loop thread
@@ -69,17 +80,6 @@ namespace
 	// (the application loop thread waits for the signal)
 	eae6320::Concurrency::cEvent s_whenDataForANewFrameCanBeSubmittedFromApplicationThread;
 
-	// Shading Data
-	//-------------
-	eae6320::Graphics::Effect effect1;
-	eae6320::Graphics::Effect effect2;
-
-	// Geometry Data
-	//--------------
-	eae6320::Graphics::Sprite sprite1;
-	eae6320::Graphics::Sprite sprite2;
-	eae6320::Graphics::Sprite sprite3;
-
 	//View Data
 	//--------------
 	eae6320::Graphics::View view;
@@ -97,7 +97,6 @@ void eae6320::Graphics::SubmitElapsedTime(const float i_elapsedSecondCount_syste
 	auto& constantData_perFrame = s_dataBeingSubmittedByApplicationThread->constantData_perFrame;
 	constantData_perFrame.g_elapsedSecondCount_systemTime = i_elapsedSecondCount_systemTime;
 	constantData_perFrame.g_elapsedSecondCount_simulationTime = i_elapsedSecondCount_simulationTime;
-
 }
 
 eae6320::cResult eae6320::Graphics::WaitUntilDataForANewFrameCanBeSubmitted(const unsigned int i_timeToWait_inMilliseconds)
@@ -113,6 +112,31 @@ eae6320::cResult eae6320::Graphics::SignalThatAllDataForAFrameHasBeenSubmitted()
 
 // Render
 //-------
+void eae6320::Graphics::ClearColor(float red, float green, float blue, float alpha)
+{
+	//Colors to clear the screen
+	s_dataBeingSubmittedByApplicationThread->red = red;
+	s_dataBeingSubmittedByApplicationThread->green = green;
+	s_dataBeingSubmittedByApplicationThread->blue = blue;
+	s_dataBeingSubmittedByApplicationThread->alpha = alpha;
+
+	
+}
+
+void eae6320::Graphics::RenderSpriteWithEffect(Sprite * sprite, Effect * effect, uint8_t numberOfPairs)
+{
+
+	for (size_t i = 0; i < numberOfPairs; i++)
+	{
+		sprite->IncrementReferenceCount();
+		effect->IncrementReferenceCount();
+
+		s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
+		s_dataBeingSubmittedByApplicationThread->sprites.push_back(sprite);
+	}
+	
+}
+
 
 void eae6320::Graphics::RenderFrame()
 {
@@ -145,16 +169,6 @@ void eae6320::Graphics::RenderFrame()
 		}
 	}
 
-	// Get the immediate context
-	effect1.GetContext();
-	effect2.GetContext();
-	sprite1.GetContext();
-	sprite2.GetContext();
-	sprite3.GetContext();
-
-	// Clear the frame
-	view.ClearColor(0.5,0.0,0.0,1.0);
-
 	EAE6320_ASSERT(s_dataBeingRenderedByRenderThread);
 
 	// Update the per-frame constant buffer
@@ -164,18 +178,37 @@ void eae6320::Graphics::RenderFrame()
 		s_constantBuffer_perFrame.Update(&constantData_perFrame);
 	}
 
+	//Clear the screen with color 
+	{
+		// Clear the frame
+		view.ClearColor(s_dataBeingRenderedByRenderThread->red, s_dataBeingRenderedByRenderThread->green,
+			s_dataBeingRenderedByRenderThread->blue, s_dataBeingRenderedByRenderThread->alpha);
+
+	}
+
 	//Bind effects and draw sprites
 	{
-		effect1.Bind();
-		sprite1.Draw();
-		effect2.Bind();
-		sprite2.Draw();
-		effect1.Bind();
-		sprite3.Draw();
+		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
+		{
+			s_dataBeingRenderedByRenderThread->effects[i]->Bind();
+			s_dataBeingRenderedByRenderThread->sprites[i]->Draw();
+		}
 	}
 
 	//Swap the buffers
 	view.ViewSwapBuffers();
+
+	//Reset the arbitrary number of sprites and effects
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
+	{
+		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
+	}
+
+	//Clear the arbitrary number of sprites and effects
+	s_dataBeingRenderedByRenderThread->effects.clear();
+	s_dataBeingRenderedByRenderThread->sprites.clear();
+
 }
 
 
@@ -279,14 +312,27 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	//Clean up the view object
 	view.CleanUp();
 
-	//Clean up the sprite
-	sprite1.CleanUp(result);
-	sprite2.CleanUp(result);
-	sprite3.CleanUp(result);
+	//Reset the arbitrary number of sprites and effects
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
+	{
+		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
+	}
 
-	//Clean up the effect
-	effect1.CleanUp(result);
-	effect2.CleanUp(result);
+	//Clear the arbitrary number of sprites and effects
+	s_dataBeingRenderedByRenderThread->effects.clear();
+	s_dataBeingRenderedByRenderThread->sprites.clear();
+
+	//Reset the arbitrary number of sprites and effects
+	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->effects.size(); i++)
+	{
+		s_dataBeingSubmittedByApplicationThread->effects[i]->DecrementReferenceCount();
+		s_dataBeingSubmittedByApplicationThread->sprites[i]->DecrementReferenceCount();
+	}
+
+	//Clear the arbitrary number of sprites and effects
+	s_dataBeingSubmittedByApplicationThread->effects.clear();
+	s_dataBeingSubmittedByApplicationThread->sprites.clear();
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();
@@ -345,17 +391,13 @@ namespace
 {
 	eae6320::cResult InitializeGeometry()
 	{
-		
-		auto result =  sprite1.Initialize(0.5f, 0.5f, 0.5f, 0.5f);
-		result = sprite2.Initialize(-0.5f, -0.5f, 1.0f, 1.0f);
-		result = sprite3.Initialize(-0.5f, 0.5f, 0.25f, 0.25f);
+		auto result = eae6320::Results::Success;
 		return result;
 	}
 
 	eae6320::cResult InitializeShadingData()
 	{
-		auto result = effect1.Initialize("sprite", "sprite1",eae6320::Graphics::RenderStates::AlphaTransparency);
-		result = effect2.Initialize("sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
+		auto result = eae6320::Results::Success;
 		return result;
 	}
 }

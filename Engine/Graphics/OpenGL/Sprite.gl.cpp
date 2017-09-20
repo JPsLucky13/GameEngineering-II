@@ -3,14 +3,10 @@
 
 
 #include <Engine\Asserts\Asserts.h>
+#include <Engine\Logging\Logging.h>
 
 // Implementation
 //===============
-void eae6320::Graphics::Sprite::GetContext()
-{
-
-}
-
 
 // Initialization / Clean Up
 //--------------------------
@@ -184,8 +180,10 @@ void eae6320::Graphics::Sprite::Draw()
 }
 
 
-void eae6320::Graphics::Sprite::CleanUp(eae6320::cResult & result)
+eae6320::cResult eae6320::Graphics::Sprite::CleanUp()
 {
+	auto result = Results::Success;
+
 	{
 		if (m_vertexArrayId != 0)
 		{
@@ -238,4 +236,7 @@ void eae6320::Graphics::Sprite::CleanUp(eae6320::cResult & result)
 			m_vertexBufferId = 0;
 		}
 	}
+
+	return result;
 }
+

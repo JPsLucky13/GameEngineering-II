@@ -10,6 +10,7 @@
 
 #include <Engine/Application/cbApplication.h>
 #include <Engine/Results/Results.h>
+#include <Engine/Graphics/Graphics.h>
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
 	#include "Resource Files/Resource.h"
@@ -65,12 +66,31 @@ namespace eae6320
 		// If you want to try creating your own a convenient website that will help is: http://icoconvert.com/
 		virtual const WORD* GetLargeIconId() const override { static constexpr WORD iconId_large = IDI_EAEALIEN; return &iconId_large; }
 		virtual const WORD* GetSmallIconId() const override { static constexpr WORD iconId_small = IDI_EAEALIEN; return &iconId_small; }
+
+		// Effects
+		//-------------
+		eae6320::Graphics::Effect * m_effect1;
+		eae6320::Graphics::Effect * m_effect2;
+
+		// Sprites
+		//--------------
+		eae6320::Graphics::Sprite * m_sprite1;
+		eae6320::Graphics::Sprite * m_sprite2;
+		eae6320::Graphics::Sprite * m_sprite3;
+
+
+
 #endif
 
 		// Run
 		//----
 
 		virtual void UpdateBasedOnInput() override;
+
+		// Submit render data
+
+		virtual void SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate) override;
+
 
 		// Initialization / Clean Up
 		//--------------------------
