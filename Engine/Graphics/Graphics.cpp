@@ -123,17 +123,15 @@ void eae6320::Graphics::ClearColor(float red, float green, float blue, float alp
 	
 }
 
-void eae6320::Graphics::RenderSpriteWithEffect(Sprite * sprite, Effect * effect, uint8_t numberOfPairs)
+void eae6320::Graphics::RenderSpriteWithEffect(Sprite * sprite, Effect * effect)
 {
 
-	for (size_t i = 0; i < numberOfPairs; i++)
-	{
+	
 		sprite->IncrementReferenceCount();
 		effect->IncrementReferenceCount();
 
 		s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
 		s_dataBeingSubmittedByApplicationThread->sprites.push_back(sprite);
-	}
 	
 }
 

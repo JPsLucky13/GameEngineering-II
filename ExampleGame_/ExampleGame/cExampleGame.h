@@ -12,6 +12,7 @@
 #include <Engine/Results/Results.h>
 #include <Engine/Graphics/Graphics.h>
 
+
 #if defined( EAE6320_PLATFORM_WINDOWS )
 	#include "Resource Files/Resource.h"
 #endif
@@ -69,16 +70,11 @@ namespace eae6320
 
 		// Effects
 		//-------------
-		eae6320::Graphics::Effect * m_effect1;
-		eae6320::Graphics::Effect * m_effect2;
+		std::vector<eae6320::Graphics::Effect *> effects;
 
 		// Sprites
 		//--------------
-		eae6320::Graphics::Sprite * m_sprite1;
-		eae6320::Graphics::Sprite * m_sprite2;
-		eae6320::Graphics::Sprite * m_sprite3;
-
-
+		std::vector<eae6320::Graphics::Sprite *> sprites;
 
 #endif
 

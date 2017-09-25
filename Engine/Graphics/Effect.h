@@ -75,17 +75,18 @@ namespace eae6320
 
 			// Data
 			//=====
-
 #if defined( EAE6320_PLATFORM_GL )
 			GLuint m_programId = 0;
 #endif
-
+			
 			eae6320::Graphics::cShader::Handle m_vertexShader;
 			eae6320::Graphics::cShader::Handle m_fragmentShader;
 
 			eae6320::Graphics::cRenderState m_renderState;
 			
 			EAE6320_ASSETS_DECLAREREFERENCECOUNT();
+
+
 
 			//Initialize and CleanUp
 			//====
