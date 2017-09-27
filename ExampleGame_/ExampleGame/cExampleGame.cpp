@@ -32,6 +32,7 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 
 	for (size_t i = 0; i < sprites.size(); i++)
 	{
+
 		eae6320::Graphics::RenderSpriteWithEffect(sprites[i],effects[i]);
 	}
 	
@@ -50,19 +51,55 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 
 	//Call to factory function for effects
-	eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite1", eae6320::Graphics::RenderStates::AlphaTransparency);
+	auto result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite1", eae6320::Graphics::RenderStates::AlphaTransparency);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	
 	effects.push_back(newEffect);
-	eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
+	
+	result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	
 	effects.push_back(newEffect);
-	eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
+
+
+	result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+
 	effects.push_back(newEffect);
 
 	//Call to factory function for sprites
 	eae6320::Graphics::Sprite::Factory(newSprite, 0.5f, 0.5f, 0.5f, 0.5f);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
 	sprites.push_back(newSprite);
 	eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, -0.5f, 1.0f, 1.0f);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
 	sprites.push_back(newSprite);
 	eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, 0.5f, 0.25f, 0.25f);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
 	sprites.push_back(newSprite);
 
 	return Results::Success;
