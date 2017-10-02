@@ -62,6 +62,9 @@ namespace
 		//Sprite
 		std::vector<eae6320::Graphics::Sprite *> sprites;
 
+		//Textures
+		std::vector<eae6320::Graphics::cTexture::Handle> textures;
+
 	};
 	// In our class there will be two copies of the data required to render a frame:
 	//	* One of them will be getting populated by the data currently being submitted by the application loop thread
@@ -123,16 +126,18 @@ void eae6320::Graphics::ClearColor(float red, float green, float blue, float alp
 	
 }
 
-void eae6320::Graphics::RenderSpriteWithEffect(Sprite * sprite, Effect * effect)
+void eae6320::Graphics::RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture::Handle texture)
 {
 
 	
 		sprite->IncrementReferenceCount();
 		effect->IncrementReferenceCount();
+		cTexture * newTexture = eae6320::Graphics::cTexture::s_manager.Get(texture);
+		newTexture->IncrementReferenceCount();
 
 		s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
 		s_dataBeingSubmittedByApplicationThread->sprites.push_back(sprite);
-	
+		s_dataBeingSubmittedByApplicationThread->textures.push_back(texture);
 }
 
 
@@ -189,6 +194,8 @@ void eae6320::Graphics::RenderFrame()
 		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
 		{
 			s_dataBeingRenderedByRenderThread->effects[i]->Bind();
+			cTexture * newTexture = eae6320::Graphics::cTexture::s_manager.Get(s_dataBeingRenderedByRenderThread->textures[i]);
+			newTexture->Bind(0);
 			s_dataBeingRenderedByRenderThread->sprites[i]->Draw();
 		}
 	}
@@ -196,16 +203,18 @@ void eae6320::Graphics::RenderFrame()
 	//Swap the buffers
 	view.ViewSwapBuffers();
 
-	//Reset the arbitrary number of sprites and effects
+	//Reset the arbitrary number of sprites, effects and textures
 	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
 	{
 		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
 		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
+		eae6320::Graphics::cTexture::s_manager.Release(s_dataBeingRenderedByRenderThread->textures[i]);
 	}
 
-	//Clear the arbitrary number of sprites and effects
+	//Clear the arbitrary number of sprites, effects and textures
 	s_dataBeingRenderedByRenderThread->effects.clear();
 	s_dataBeingRenderedByRenderThread->sprites.clear();
+	s_dataBeingRenderedByRenderThread->textures.clear();
 
 }
 
@@ -315,22 +324,26 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	{
 		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
 		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
+		eae6320::Graphics::cTexture::s_manager.Release(s_dataBeingRenderedByRenderThread->textures[i]);
 	}
 
 	//Clear the arbitrary number of sprites and effects
 	s_dataBeingRenderedByRenderThread->effects.clear();
 	s_dataBeingRenderedByRenderThread->sprites.clear();
+	s_dataBeingRenderedByRenderThread->textures.clear();
 
 	//Reset the arbitrary number of sprites and effects
 	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->effects.size(); i++)
 	{
 		s_dataBeingSubmittedByApplicationThread->effects[i]->DecrementReferenceCount();
 		s_dataBeingSubmittedByApplicationThread->sprites[i]->DecrementReferenceCount();
+		eae6320::Graphics::cTexture::s_manager.Release(s_dataBeingSubmittedByApplicationThread->textures[i]);
 	}
 
 	//Clear the arbitrary number of sprites and effects
 	s_dataBeingSubmittedByApplicationThread->effects.clear();
 	s_dataBeingSubmittedByApplicationThread->sprites.clear();
+	s_dataBeingSubmittedByApplicationThread->textures.clear();
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();

@@ -75,6 +75,7 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize(float centerPosX, float c
 		const auto vertexCount = triangleCount * vertexCountPerTriangle;
 		eae6320::Graphics::VertexFormats::sSprite vertexData[vertexCount];
 		{
+			//Position data
 			vertexData[0].x = centerPosX - width * 0.5f;
 			vertexData[0].y = centerPosY - height * 0.5f;
 
@@ -86,6 +87,21 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize(float centerPosX, float c
 
 			vertexData[3].x = centerPosX + width * 0.5f;
 			vertexData[3].y = centerPosY + height * 0.5f;
+
+			//Texture data
+			vertexData[0].u = 0.0f;
+			vertexData[0].v = 0.0f;
+
+			vertexData[1].u = 1.0f;
+			vertexData[1].v = 0.0f;
+
+			vertexData[2].u = 0.0f;
+			vertexData[2].v = 1.0f;
+
+			vertexData[3].u = 1.0f;
+			vertexData[3].v = 1.0f;
+
+
 		}
 		const auto bufferSize = vertexCount * sizeof(eae6320::Graphics::VertexFormats::sSprite);
 		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
@@ -136,6 +152,39 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize(float centerPosX, float c
 				result = eae6320::Results::Failure;
 				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				eae6320::Logging::OutputError("OpenGL failed to set the POSITION vertex attribute at location %u: %s",
+					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				goto OnExit;
+			}
+		}
+
+		// Texture (1)
+		// 2 floats == 8 bytes
+		// Offset = 8
+		{
+			constexpr GLuint vertexElementLocation = 1;
+			constexpr GLint elementCount = 2;
+			constexpr GLboolean notNormalized = GL_FALSE;	// The given floats should be used as-is
+			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, notNormalized, stride,
+				reinterpret_cast<GLvoid*>(offsetof(eae6320::Graphics::VertexFormats::sSprite, u)));
+			const auto errorCode = glGetError();
+			if (errorCode == GL_NO_ERROR)
+			{
+				glEnableVertexAttribArray(vertexElementLocation);
+				const GLenum errorCode = glGetError();
+				if (errorCode != GL_NO_ERROR)
+				{
+					result = eae6320::Results::Failure;
+					EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+					eae6320::Logging::OutputError("OpenGL failed to enable the TEXTURE vertex attribute at location %u: %s",
+						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+					goto OnExit;
+				}
+			}
+			else
+			{
+				result = eae6320::Results::Failure;
+				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				eae6320::Logging::OutputError("OpenGL failed to set the TEXTURE vertex attribute at location %u: %s",
 					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				goto OnExit;
 			}

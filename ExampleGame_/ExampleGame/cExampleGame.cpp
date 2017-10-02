@@ -29,13 +29,12 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 {
 
 	//Render the sprite pairs
-
 	for (size_t i = 0; i < sprites.size(); i++)
 	{
-
-		eae6320::Graphics::RenderSpriteWithEffect(sprites[i],effects[i]);
+		eae6320::Graphics::RenderSpriteWithEffectAndTexture(sprites[i],effects[i],textures[i]);
 	}
 	
+	//
 
 	//User specify's the background clear color
 	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
@@ -80,27 +79,55 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	effects.push_back(newEffect);
 
 	//Call to factory function for sprites
-	eae6320::Graphics::Sprite::Factory(newSprite, 0.5f, 0.5f, 0.5f, 0.5f);
+	result = eae6320::Graphics::Sprite::Factory(newSprite, 0.5f, 0.5f, 0.5f, 0.5f);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
 		return Results::Failure;
 	}
 	sprites.push_back(newSprite);
-	eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, -0.5f, 1.0f, 1.0f);
+	result = eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, -0.5f, 1.0f, 1.0f);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
 		return Results::Failure;
 	}
 	sprites.push_back(newSprite);
-	eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, 0.5f, 0.25f, 0.25f);
+	result = eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, 0.5f, 0.25f, 0.25f);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
 		return Results::Failure;
 	}
 	sprites.push_back(newSprite);
+
+	//Texture creation
+	eae6320::Graphics::cTexture::Handle newTexture;
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture1.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textures.push_back(newTexture);
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture2.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textures.push_back(newTexture);
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture3.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textures.push_back(newTexture);
+
 
 	return Results::Success;
 }
@@ -116,6 +143,12 @@ eae6320::cResult eae6320::cExampleGame::CleanUp()
 	for (size_t i = 0; i < sprites.size(); i++)
 	{
 		eae6320::Graphics::Sprite::Delete(sprites[i]);
+	}
+
+	//Destroy the textures
+	for (size_t i = 0; i < textures.size(); i++)
+	{
+		eae6320::Graphics::cTexture::s_manager.Release(textures[i]);
 	}
 
 	return Results::Success;
