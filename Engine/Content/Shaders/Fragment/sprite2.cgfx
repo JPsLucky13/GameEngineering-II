@@ -21,11 +21,18 @@ cbuffer g_constantBuffer_perMaterial : register(b1)
 	float4 g_color;
 }
 
+Texture2D g_color_texture : register( t0 );
+SamplerState g_color_samplerState : register( s0 );
 
 // Entry Point
 //============
 
 void main(
+	// Input
+	//=======
+	in const float4 i_position : SV_POSITION,
+	in const float2 i_uv : TEXCOORD0,
+
 
 	// Output
 	//=======
@@ -36,12 +43,10 @@ void main(
 
 	)
 {
+	const float4 sampledColor = g_color_texture.Sample( g_color_samplerState, i_uv );
+
 	// Output solid white
-	o_color = float4(
-		// RGB
-		1.0, 1.0, 1.0,
-		// Alpha
-		1.0 );
+	o_color = sampledColor;
 
 	// EAE6320_TODO: Change the color based on time!
 	// The value g_elapsedSecondCount_simulationTime constantly changes as the simulation progresses, and so by doing something like:
@@ -72,6 +77,9 @@ layout( std140, binding = 1 ) uniform g_constantBuffer_perMaterial
 	vec4 g_color;
 };
 
+layout( binding = 0 ) uniform sampler2D g_color_texture;
+layout( location = 0 ) in vec2 i_uv;
+
 // Output
 //=======
 
@@ -84,12 +92,12 @@ out vec4 o_color;
 
 void main()
 {
+
+
+	vec4 sampledColor = texture2D( g_color_texture, i_uv );
+
 	// Output solid white
-	o_color = vec4(
-		// RGB
-		1.0, 1.0,1.0,
-		// Alpha
-		1.0 );
+	o_color = sampledColor;
 
 	// EAE6320_TODO: Change the color based on time!
 	// The value g_elapsedSecondCount_simulationTime constantly changes as the simulation progresses, and so by doing something like:

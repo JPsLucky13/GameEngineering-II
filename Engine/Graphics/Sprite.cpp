@@ -1,7 +1,6 @@
 #include "Sprite.h"
 
 #include "sContext.h"
-#include "VertexFormats.h"
 
 
 #include <Engine\Asserts\Asserts.h>
@@ -71,3 +70,6 @@ eae6320::Graphics::Sprite::~Sprite()
 {
 	CleanUp();
 }
+
+
+

@@ -11,6 +11,8 @@
 #include "Configuration.h"
 #include "Effect.h"
 #include "Sprite.h"
+#include "cTexture.h"
+#include "cTexture.h"
 
 #include <cstdint>
 #include <Engine/Results/Results.h>
@@ -56,7 +58,7 @@ namespace eae6320
 		// (i.e. as soon as SignalThatAllDataForAFrameHasBeenSubmitted() has been called)
 		void RenderFrame();
 
-		void RenderSpriteWithEffect(Sprite * sprite, Effect * effect);
+		void RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture::Handle texture);
 
 
 		// Initialization / Clean Up

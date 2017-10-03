@@ -1,5 +1,5 @@
 #include "../Sprite.h"
-#include "../VertexFormats.h"
+
 
 
 #include <Engine\Asserts\Asserts.h>
@@ -75,17 +75,46 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize(float centerPosX, float c
 		const auto vertexCount = triangleCount * vertexCountPerTriangle;
 		eae6320::Graphics::VertexFormats::sSprite vertexData[vertexCount];
 		{
+			//Position data
 			vertexData[0].x = centerPosX - width * 0.5f;
 			vertexData[0].y = centerPosY - height * 0.5f;
 
-			vertexData[1].x = centerPosX + width * 0.5f;
-			vertexData[1].y = centerPosY - height * 0.5f;
-
-			vertexData[2].x = centerPosX - width * 0.5f;
-			vertexData[2].y = centerPosY + height * 0.5f;
-
 			vertexData[3].x = centerPosX + width * 0.5f;
 			vertexData[3].y = centerPosY + height * 0.5f;
+
+			CalculateXYRemainingVertices(centerPosX, centerPosY, width, height, vertexData);
+
+			//Texture data
+
+			//Calculating the u component
+			vertexData[0].u = 0.0f;
+
+			if (vertexData[1].x - vertexData[0].x >= width)
+			{
+				vertexData[1].u = 1.0f;
+			}
+			else
+			{
+				vertexData[1].u = 0.0f;
+			}
+
+			if (vertexData[2].x - vertexData[0].x >= width)
+			{
+				vertexData[2].u = 1.0f;
+			}
+			else
+			{
+				vertexData[2].u = 0.0f;
+			}
+			vertexData[3].u = 1.0f;
+
+			//Calculating the v component
+			vertexData[1].v = 0.0f;
+			vertexData[2].v = 1.0f;
+
+			CalculateUVRemainingVertices(vertexData);
+
+
 		}
 		const auto bufferSize = vertexCount * sizeof(eae6320::Graphics::VertexFormats::sSprite);
 		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
@@ -136,6 +165,39 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize(float centerPosX, float c
 				result = eae6320::Results::Failure;
 				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				eae6320::Logging::OutputError("OpenGL failed to set the POSITION vertex attribute at location %u: %s",
+					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				goto OnExit;
+			}
+		}
+
+		// Texture (1)
+		// 2 floats == 8 bytes
+		// Offset = 8
+		{
+			constexpr GLuint vertexElementLocation = 1;
+			constexpr GLint elementCount = 2;
+			constexpr GLboolean notNormalized = GL_FALSE;	// The given floats should be used as-is
+			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, notNormalized, stride,
+				reinterpret_cast<GLvoid*>(offsetof(eae6320::Graphics::VertexFormats::sSprite, u)));
+			const auto errorCode = glGetError();
+			if (errorCode == GL_NO_ERROR)
+			{
+				glEnableVertexAttribArray(vertexElementLocation);
+				const GLenum errorCode = glGetError();
+				if (errorCode != GL_NO_ERROR)
+				{
+					result = eae6320::Results::Failure;
+					EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+					eae6320::Logging::OutputError("OpenGL failed to enable the TEXTURE vertex attribute at location %u: %s",
+						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+					goto OnExit;
+				}
+			}
+			else
+			{
+				result = eae6320::Results::Failure;
+				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				eae6320::Logging::OutputError("OpenGL failed to set the TEXTURE vertex attribute at location %u: %s",
 					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				goto OnExit;
 			}
@@ -239,4 +301,24 @@ eae6320::cResult eae6320::Graphics::Sprite::CleanUp()
 
 	return result;
 }
+
+void eae6320::Graphics::Sprite::CalculateXYRemainingVertices(float centerPosX, float centerPosY, float width, float height, eae6320::Graphics::VertexFormats::sSprite vertexData[])
+{
+
+	vertexData[1].x = centerPosX + width * 0.5f;
+	vertexData[1].y = centerPosY - height * 0.5f;
+
+	vertexData[2].x = centerPosX - width * 0.5f;
+	vertexData[2].y = centerPosY + height * 0.5f;
+
+
+}
+
+void eae6320::Graphics::Sprite::CalculateUVRemainingVertices(eae6320::Graphics::VertexFormats::sSprite vertexData[])
+{
+
+	vertexData[0].v = 0.0f;
+	vertexData[3].v = 1.0f;
+}
+
 
