@@ -28,9 +28,6 @@
     <ProjectReference Include="..\..\Engine\Results\Results.vcxproj">
       <Project>{5003f315-b5d5-48ab-ba3f-1cb0dec8c213}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\External\Lua\LuaLib.vcxproj">
-      <Project>{a506e35d-bb34-468d-82cd-112386be29d1}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\AssetBuildLibrary\AssetBuildLibrary.vcxproj">
       <Project>{4438bc28-0c79-4907-bd5c-abad0dd78aec}</Project>
     </ProjectReference>

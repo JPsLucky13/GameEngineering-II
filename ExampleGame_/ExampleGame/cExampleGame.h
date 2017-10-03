@@ -68,6 +68,15 @@ namespace eae6320
 		virtual const WORD* GetLargeIconId() const override { static constexpr WORD iconId_large = IDI_EAEALIEN; return &iconId_large; }
 		virtual const WORD* GetSmallIconId() const override { static constexpr WORD iconId_small = IDI_EAEALIEN; return &iconId_small; }
 
+		// KeyPressState
+		//-------------
+		bool isKeyPressedAlready;
+
+		// Elapsed Time
+		//-------------
+		float counter = 0.0f;
+		float timeToSwitchTexture = 1.0f;
+
 		// Effects
 		//-------------
 		std::vector<eae6320::Graphics::Effect *> effects;
@@ -85,6 +94,7 @@ namespace eae6320
 		//----
 
 		virtual void UpdateBasedOnInput() override;
+		virtual void UpdateBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate) override;
 
 		// Submit render data
 

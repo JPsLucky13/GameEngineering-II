@@ -23,7 +23,44 @@ void eae6320::cExampleGame::UpdateBasedOnInput()
 		const auto result = Exit( EXIT_SUCCESS );
 		EAE6320_ASSERT( result );
 	}
+
+	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Right))
+	{
+
+		if (!isKeyPressedAlready)
+		{
+			isKeyPressedAlready = true;
+
+			// Exit the application
+			eae6320::Graphics::cTexture::Handle storedTexture = textures[0];
+			textures[0] = textures[1];
+			textures[1] = storedTexture;
+		}
+		
+	}
+	
+	if (!UserInput::IsKeyPressed(UserInput::KeyCodes::Right))
+	{
+		isKeyPressedAlready = false;
+	}
 }
+
+void eae6320::cExampleGame::UpdateBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate)
+{
+
+	counter += i_elapsedSecondCount_sinceLastUpdate;
+
+	if (counter > timeToSwitchTexture)
+	{
+		eae6320::Graphics::cTexture::Handle storedTexture = textures[2];
+		textures[2] = textures[3];
+		textures[3] = storedTexture;
+		counter = 0.0f;
+
+	}
+
+}
+
 
 void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate)
 {
@@ -33,8 +70,6 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 	{
 		eae6320::Graphics::RenderSpriteWithEffectAndTexture(sprites[i],effects[i],textures[i]);
 	}
-	
-	//
 
 	//User specify's the background clear color
 	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
@@ -121,6 +156,14 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	textures.push_back(newTexture);
 
 	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture3.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textures.push_back(newTexture);
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture4.png", newTexture);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
