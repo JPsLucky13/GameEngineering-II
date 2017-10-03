@@ -8,6 +8,8 @@ This file declares the external interface for the effect
 // Include Files
 //==============
 
+#include "VertexFormats.h"
+
 #if defined( EAE6320_PLATFORM_GL )
 #include "OpenGL\Includes.h"
 #endif
@@ -92,12 +94,14 @@ namespace eae6320
 			eae6320::cResult Initialize(float centerPosX, float centerPosY, float width, float height);
 			eae6320::cResult CleanUp();
 
-
 			//Constructor
 			Sprite();
 
 			//Destructor
 			~Sprite();
+
+			void CalculateXYRemainingVertices(float centerPosX, float centerPosY, float width, float height,eae6320::Graphics::VertexFormats::sSprite vertexData[]);
+			void CalculateUVRemainingVertices(eae6320::Graphics::VertexFormats::sSprite vertexData[]);
 
 		};
 	}

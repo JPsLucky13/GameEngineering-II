@@ -1,5 +1,5 @@
 #include "../Sprite.h"
-#include "../VertexFormats.h"
+
 
 
 #include <Engine\Asserts\Asserts.h>
@@ -79,27 +79,40 @@ eae6320::cResult eae6320::Graphics::Sprite::Initialize(float centerPosX, float c
 			vertexData[0].x = centerPosX - width * 0.5f;
 			vertexData[0].y = centerPosY - height * 0.5f;
 
-			vertexData[1].x = centerPosX + width * 0.5f;
-			vertexData[1].y = centerPosY - height * 0.5f;
-
-			vertexData[2].x = centerPosX - width * 0.5f;
-			vertexData[2].y = centerPosY + height * 0.5f;
-
 			vertexData[3].x = centerPosX + width * 0.5f;
 			vertexData[3].y = centerPosY + height * 0.5f;
 
+			CalculateXYRemainingVertices(centerPosX, centerPosY, width, height, vertexData);
+
 			//Texture data
+
+			//Calculating the u component
 			vertexData[0].u = 0.0f;
-			vertexData[0].v = 0.0f;
 
-			vertexData[1].u = 1.0f;
+			if (vertexData[1].x - vertexData[0].x >= width)
+			{
+				vertexData[1].u = 1.0f;
+			}
+			else
+			{
+				vertexData[1].u = 0.0f;
+			}
+
+			if (vertexData[2].x - vertexData[0].x >= width)
+			{
+				vertexData[2].u = 1.0f;
+			}
+			else
+			{
+				vertexData[2].u = 0.0f;
+			}
+			vertexData[3].u = 1.0f;
+
+			//Calculating the v component
 			vertexData[1].v = 0.0f;
-
-			vertexData[2].u = 0.0f;
 			vertexData[2].v = 1.0f;
 
-			vertexData[3].u = 1.0f;
-			vertexData[3].v = 1.0f;
+			CalculateUVRemainingVertices(vertexData);
 
 
 		}
@@ -288,4 +301,24 @@ eae6320::cResult eae6320::Graphics::Sprite::CleanUp()
 
 	return result;
 }
+
+void eae6320::Graphics::Sprite::CalculateXYRemainingVertices(float centerPosX, float centerPosY, float width, float height, eae6320::Graphics::VertexFormats::sSprite vertexData[])
+{
+
+	vertexData[1].x = centerPosX + width * 0.5f;
+	vertexData[1].y = centerPosY - height * 0.5f;
+
+	vertexData[2].x = centerPosX - width * 0.5f;
+	vertexData[2].y = centerPosY + height * 0.5f;
+
+
+}
+
+void eae6320::Graphics::Sprite::CalculateUVRemainingVertices(eae6320::Graphics::VertexFormats::sSprite vertexData[])
+{
+
+	vertexData[0].v = 0.0f;
+	vertexData[3].v = 1.0f;
+}
+
 
