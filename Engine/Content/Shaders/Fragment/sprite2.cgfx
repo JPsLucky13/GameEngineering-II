@@ -4,25 +4,27 @@
 
 #include <Shaders/shaders.inc>
 
-#if defined( EAE6320_PLATFORM_D3D )
 // Constant Buffers
 //=================
 
-cbuffer g_constantBuffer_perFrame : register(b0)
+DeclareConstantBuffer(g_constantBuffer_perFrame,0)
 {
 	float g_elapsedSecondCount_systemTime;
 	float g_elapsedSecondCount_simulationTime;
 	// For float4 alignment
 	float2 g_padding;
-}
+};
 
-cbuffer g_constantBuffer_perMaterial : register(b1)
+DeclareConstantBuffer(g_constantBuffer_perMaterial,1)
 {
 	float4 g_color;
-}
+};
 
-Texture2D g_color_texture : register( t0 );
-SamplerState g_color_samplerState : register( s0 );
+
+DeclareColorTexture(g_color_texture,0);
+DeclareSamplerState(g_color_samplerState,0);
+
+#if defined( EAE6320_PLATFORM_D3D )
 
 // Entry Point
 //============
@@ -42,42 +44,9 @@ void main(
 	out float4 o_color : SV_TARGET
 
 	)
-{
-	const float4 sampledColor = g_color_texture.Sample( g_color_samplerState, i_uv );
-
-	// Output solid white
-	o_color = sampledColor;
-
-	// EAE6320_TODO: Change the color based on time!
-	// The value g_elapsedSecondCount_simulationTime constantly changes as the simulation progresses, and so by doing something like:
-	//	sin( g_elapsedSecondCount_simulationTime ) or cos( g_elapsedSecondCount_simulationTime )
-	// you can get a value that will oscillate between [-1,1].
-	// You should change at least one "channel" so that the color animates.
-	// For example, to change red ("r") you would do something kind of like:
-	//		o_color.r = ? sin( g_elapsedSecondCount_simulationTime ) ?
-	// You can change .r, .g, and .b (but leave .a as 1.0).
-	// Remember that your final values should be [0,1], so you will have to do some math.
-}
 
 #elif defined( EAE6320_PLATFORM_GL )
 
-// Constant Buffers
-//=================
-
-layout( std140, binding = 0 ) uniform g_constantBuffer_perFrame
-{
-	float g_elapsedSecondCount_systemTime;
-	float g_elapsedSecondCount_simulationTime;
-	// For vec4 alignment
-	vec2 g_padding;
-};
-
-layout( std140, binding = 1 ) uniform g_constantBuffer_perMaterial
-{
-	vec4 g_color;
-};
-
-layout( binding = 0 ) uniform sampler2D g_color_texture;
 layout( location = 0 ) in vec2 i_uv;
 
 // Output
@@ -91,10 +60,11 @@ out vec4 o_color;
 //============
 
 void main()
+
+#endif
+
 {
-
-
-	vec4 sampledColor = texture2D( g_color_texture, i_uv );
+	const float4 sampledColor = CalculateSampledColor(g_color_texture,g_color_samplerState, i_uv );
 
 	// Output solid white
 	o_color = sampledColor;
@@ -109,5 +79,3 @@ void main()
 	// You can change .r, .g, and .b (but leave .a as 1.0).
 	// Remember that your final values should be [0,1], so you will have to do some math.
 }
-
-#endif

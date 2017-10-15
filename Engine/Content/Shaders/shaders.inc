@@ -32,6 +32,7 @@
 	#define float2x2 mat2
 	#define float3x3 mat3
 	#define float4x4 mat4
+	#define o_position gl_Position
 
 #endif
 
@@ -41,9 +42,15 @@
 #if defined( EAE6320_PLATFORM_D3D )
 
 	#define DeclareConstantBuffer( i_name, i_id ) cbuffer i_name : register( b##i_id )
+	#define DeclareColorTexture( i_name, i_id ) Texture2D i_name : register( t##i_id )
+	#define DeclareSamplerState( i_name, i_id ) SamplerState i_name : register( s##i_id )
+	#define CalculateSampledColor(i_texture, i_samplerState,i_uv) i_texture.Sample( i_samplerState, i_uv )
 
 #elif defined( EAE6320_PLATFORM_GL )
 
 	#define DeclareConstantBuffer( i_name, i_id ) layout( std140, binding = i_id ) uniform i_name
+	#define DeclareColorTexture( i_name, i_id ) layout( binding = i_id ) uniform sampler2D i_name
+	#define DeclareSamplerState( i_name, i_id ) 
+	#define CalculateSampledColor(i_texture, i_samplerState,i_uv) texture2D(i_texture, i_uv )
 
 #endif
