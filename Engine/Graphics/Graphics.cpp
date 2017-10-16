@@ -63,7 +63,7 @@ namespace
 		std::vector<eae6320::Graphics::Sprite *> sprites;
 
 		//Textures
-		std::vector<eae6320::Graphics::cTexture::Handle> textures;
+		std::vector<eae6320::Graphics::cTexture *> textures;
 
 	};
 	// In our class there will be two copies of the data required to render a frame:
@@ -126,14 +126,13 @@ void eae6320::Graphics::ClearColor(float red, float green, float blue, float alp
 	
 }
 
-void eae6320::Graphics::RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture::Handle texture)
+void eae6320::Graphics::RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture * texture)
 {
 
 	
 		sprite->IncrementReferenceCount();
 		effect->IncrementReferenceCount();
-		cTexture * newTexture = eae6320::Graphics::cTexture::s_manager.Get(texture);
-		newTexture->IncrementReferenceCount();
+		texture->IncrementReferenceCount();
 
 		s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
 		s_dataBeingSubmittedByApplicationThread->sprites.push_back(sprite);
@@ -194,8 +193,7 @@ void eae6320::Graphics::RenderFrame()
 		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
 		{
 			s_dataBeingRenderedByRenderThread->effects[i]->Bind();
-			cTexture * newTexture = eae6320::Graphics::cTexture::s_manager.Get(s_dataBeingRenderedByRenderThread->textures[i]);
-			newTexture->Bind(0);
+			s_dataBeingRenderedByRenderThread->textures[i]->Bind(0);
 			s_dataBeingRenderedByRenderThread->sprites[i]->Draw();
 		}
 	}
@@ -208,7 +206,7 @@ void eae6320::Graphics::RenderFrame()
 	{
 		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
 		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
-		eae6320::Graphics::cTexture::s_manager.Release(s_dataBeingRenderedByRenderThread->textures[i]);
+		s_dataBeingRenderedByRenderThread->textures[i]->DecrementReferenceCount();
 	}
 
 	//Clear the arbitrary number of sprites, effects and textures
@@ -324,7 +322,7 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	{
 		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
 		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
-		eae6320::Graphics::cTexture::s_manager.Release(s_dataBeingRenderedByRenderThread->textures[i]);
+		s_dataBeingRenderedByRenderThread->textures[i]->DecrementReferenceCount();
 	}
 
 	//Clear the arbitrary number of sprites and effects
@@ -337,7 +335,7 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	{
 		s_dataBeingSubmittedByApplicationThread->effects[i]->DecrementReferenceCount();
 		s_dataBeingSubmittedByApplicationThread->sprites[i]->DecrementReferenceCount();
-		eae6320::Graphics::cTexture::s_manager.Release(s_dataBeingSubmittedByApplicationThread->textures[i]);
+		s_dataBeingSubmittedByApplicationThread->textures[i]->DecrementReferenceCount();
 	}
 
 	//Clear the arbitrary number of sprites and effects
