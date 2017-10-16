@@ -58,7 +58,7 @@ namespace eae6320
 		// (i.e. as soon as SignalThatAllDataForAFrameHasBeenSubmitted() has been called)
 		void RenderFrame();
 
-		void RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture::Handle texture);
+		void RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture * texture);
 
 
 		// Initialization / Clean Up

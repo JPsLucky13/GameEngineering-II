@@ -87,7 +87,8 @@ namespace eae6320
 
 		// Textures
 		//--------------
-		std::vector<eae6320::Graphics::cTexture::Handle> textures;
+		std::vector<eae6320::Graphics::cTexture::Handle> textureHandles;
+		std::vector<eae6320::Graphics::cTexture *> textures;
 #endif
 
 		// Run
