@@ -11,6 +11,8 @@
 #include "Configuration.h"
 #include "Effect.h"
 #include "Sprite.h"
+#include "Effect.h"
+#include "Mesh.h"
 #include "cTexture.h"
 #include "cTexture.h"
 
@@ -59,6 +61,8 @@ namespace eae6320
 		void RenderFrame();
 
 		void RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture * texture);
+
+		void RenderMeshWithEffectAtPosition(Mesh * mesh, Effect * effect, float posX, float posY);
 
 
 		// Initialization / Clean Up

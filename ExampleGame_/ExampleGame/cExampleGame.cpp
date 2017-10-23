@@ -31,7 +31,7 @@ void eae6320::cExampleGame::UpdateBasedOnInput()
 		{
 			isKeyPressedAlready = true;
 
-			std::swap(textures[0], textures[1]);
+			//std::swap(textures[0], textures[1]);
 		}
 		
 	}
@@ -49,7 +49,7 @@ void eae6320::cExampleGame::UpdateBasedOnTime(const float i_elapsedSecondCount_s
 
 	if (counter > timeToSwitchTexture)
 	{
-		std::swap(textures[2], textures[3]);
+		std::swap(textures[0], textures[1]);
 		counter = 0.0f;
 
 	}
@@ -66,6 +66,9 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 		eae6320::Graphics::RenderSpriteWithEffectAndTexture(sprites[i],effects[i], textures[i]);
 	}
 
+	//Render the mesh with its effect
+	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[0], effects[0], 0.0f, 0.0f);
+
 	//User specify's the background clear color
 	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
 }
@@ -80,16 +83,8 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 
 	//Call to factory function for effects
-	auto result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite1", eae6320::Graphics::RenderStates::AlphaTransparency);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
 	
-	effects.push_back(newEffect);
-	
-	result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
+	auto result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
@@ -108,23 +103,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 	effects.push_back(newEffect);
 
-	result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
 
-	effects.push_back(newEffect);
-
-	result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-
-	effects.push_back(newEffect);
 
 	//Call to factory function for sprites
 	result = eae6320::Graphics::Sprite::Factory(newSprite, 0.5f, 0.5f, 0.5f, 0.5f);
@@ -135,67 +114,8 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	}
 	sprites.push_back(newSprite);
 
-	result = eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, -0.5f, 1.0f, 1.0f);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	sprites.push_back(newSprite);
-
-	result = eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, 0.5f, 0.25f, 0.25f);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	sprites.push_back(newSprite);
-
-	result = eae6320::Graphics::Sprite::Factory(newSprite, 0.5f, -0.5f, 0.5f, 0.5f);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	sprites.push_back(newSprite);
-
-	result = eae6320::Graphics::Sprite::Factory(newSprite, 0.5f, 0.0f, 0.5f, 0.5f);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	sprites.push_back(newSprite);
-
 	//Texture creation
 	eae6320::Graphics::cTexture::Handle newTexture;
-
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture1.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
-
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture2.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
-
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture3.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
 	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture4.png", newTexture);
 	if (!result)
@@ -215,6 +135,46 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	textureHandles.push_back(newTexture);
 	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
+	//Mesh creation
+	eae6320::Graphics::Mesh * newMesh;
+
+	//Vertex data
+	eae6320::Graphics::VertexFormats::sMesh vertexData[3];
+
+	vertexData[0].x = 0.0f;
+	vertexData[0].y = 0.0f;
+	vertexData[0].r = 255;
+	vertexData[0].g = 0;
+	vertexData[0].b = 0;
+	vertexData[0].a = 255;
+
+	vertexData[1].x = 0.0f;
+	vertexData[1].y = 1.0f;
+	vertexData[1].r = 0;
+	vertexData[1].g = 255;
+	vertexData[1].b = 0;
+	vertexData[1].a = 255;
+
+	vertexData[2].x = 1.0f;
+	vertexData[2].y = 0.0f;
+	vertexData[2].r = 0;
+	vertexData[2].g = 0;
+	vertexData[2].b = 255;
+	vertexData[2].a = 255;
+
+	//Index data
+	uint16_t indexData[3];
+	indexData[0] = 0;
+	indexData[1] = 1;
+	indexData[2] = 2;
+
+	result = eae6320::Graphics::Mesh::Factory(newMesh, vertexData,indexData);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	meshes.push_back(newMesh);
 
 	return Results::Success;
 }
@@ -236,6 +196,12 @@ eae6320::cResult eae6320::cExampleGame::CleanUp()
 	for (size_t i = 0; i < textures.size(); i++)
 	{
 		eae6320::Graphics::cTexture::s_manager.Release(textureHandles[i]);
+	}
+
+	//Destroy the meshes
+	for (size_t i = 0; i < meshes.size(); i++)
+	{
+		eae6320::Graphics::Mesh::Delete(meshes[i]);
 	}
 
 	return Results::Success;

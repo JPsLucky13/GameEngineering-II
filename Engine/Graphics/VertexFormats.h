@@ -10,6 +10,7 @@
 //==============
 
 #include "Configuration.h"
+#include "stdint.h"
 
 // Vertex Formats
 //===============
@@ -38,6 +39,19 @@ namespace eae6320
 				//2 floats == 8 bytes
 				//Offest = 8
 				float x, y,u,v;
+			};
+
+			struct sMesh
+			{
+				// POSITION
+				// 2 floats == 8 bytes
+				// Offset = 0
+				float x, y;
+
+				//COLOR0
+				//4 uint8_t == 4 bytes
+				//Offest = 8
+				uint8_t r, g, b, a;
 			};
 		}
 	}

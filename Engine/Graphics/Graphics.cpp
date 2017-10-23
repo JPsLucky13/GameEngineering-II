@@ -38,6 +38,8 @@ namespace
 
 	// Constant buffer object
 	eae6320::Graphics::cConstantBuffer s_constantBuffer_perFrame(eae6320::Graphics::ConstantBufferTypes::PerFrame);
+	// Constant buffer object
+	eae6320::Graphics::cConstantBuffer s_constantBuffer_perDrawCall(eae6320::Graphics::ConstantBufferTypes::PerDrawCall);
 	// In our class we will only have a single sampler state
 	eae6320::Graphics::cSamplerState s_samplerState;
 
@@ -49,6 +51,7 @@ namespace
 	struct sDataRequiredToRenderAFrame
 	{
 		eae6320::Graphics::ConstantBufferFormats::sPerFrame constantData_perFrame;
+		
 		
 		//ColorData
 		float red;
@@ -65,13 +68,20 @@ namespace
 		//Textures
 		std::vector<eae6320::Graphics::cTexture *> textures;
 
+		eae6320::Graphics::ConstantBufferFormats::sPerDrawCall constantData_perDrawCall;
+
+		//Meshes
+		std::vector<eae6320::Graphics::Mesh *> meshes;
+
 	};
+
 	// In our class there will be two copies of the data required to render a frame:
 	//	* One of them will be getting populated by the data currently being submitted by the application loop thread
 	//	* One of them will be fully populated, 
 	sDataRequiredToRenderAFrame s_dataRequiredToRenderAFrame[2];
 	auto* s_dataBeingSubmittedByApplicationThread = &s_dataRequiredToRenderAFrame[0];
 	auto* s_dataBeingRenderedByRenderThread = &s_dataRequiredToRenderAFrame[1];
+
 	// The following two events work together to make sure that
 	// the main/render thread and the application loop thread can work in parallel but stay in sync:
 	// This event is signaled by the application loop thread when it has finished submitting render data for a frame
@@ -100,6 +110,7 @@ void eae6320::Graphics::SubmitElapsedTime(const float i_elapsedSecondCount_syste
 	auto& constantData_perFrame = s_dataBeingSubmittedByApplicationThread->constantData_perFrame;
 	constantData_perFrame.g_elapsedSecondCount_systemTime = i_elapsedSecondCount_systemTime;
 	constantData_perFrame.g_elapsedSecondCount_simulationTime = i_elapsedSecondCount_simulationTime;
+
 }
 
 eae6320::cResult eae6320::Graphics::WaitUntilDataForANewFrameCanBeSubmitted(const unsigned int i_timeToWait_inMilliseconds)
@@ -137,6 +148,21 @@ void eae6320::Graphics::RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect
 		s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
 		s_dataBeingSubmittedByApplicationThread->sprites.push_back(sprite);
 		s_dataBeingSubmittedByApplicationThread->textures.push_back(texture);
+}
+
+void eae6320::Graphics::RenderMeshWithEffectAtPosition(Mesh * mesh, Effect * effect, float posX, float posY)
+{
+
+
+	mesh->IncrementReferenceCount();
+	effect->IncrementReferenceCount();
+
+	s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
+	s_dataBeingSubmittedByApplicationThread->meshes.push_back(mesh);
+
+	auto& constantData_perDrawCall = s_dataBeingSubmittedByApplicationThread->constantData_perDrawCall;
+	constantData_perDrawCall.g_position.x = posX;
+	constantData_perDrawCall.g_position.y = posY;
 }
 
 
@@ -178,6 +204,7 @@ void eae6320::Graphics::RenderFrame()
 		// Copy the data from the system memory that the application owns to GPU memory
 		auto& constantData_perFrame = s_dataBeingRenderedByRenderThread->constantData_perFrame;
 		s_constantBuffer_perFrame.Update(&constantData_perFrame);
+		
 	}
 
 	//Clear the screen with color 
@@ -190,10 +217,14 @@ void eae6320::Graphics::RenderFrame()
 
 	//Bind effects and draw sprites
 	{
+		
+		auto& constantData_perDrawCall = s_dataBeingRenderedByRenderThread->constantData_perDrawCall;
 		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
 		{
+			s_constantBuffer_perDrawCall.Update(&constantData_perDrawCall);
 			s_dataBeingRenderedByRenderThread->effects[i]->Bind();
 			s_dataBeingRenderedByRenderThread->textures[i]->Bind(0);
+			s_dataBeingRenderedByRenderThread->meshes[i]->Draw();
 			s_dataBeingRenderedByRenderThread->sprites[i]->Draw();
 		}
 	}
@@ -207,12 +238,14 @@ void eae6320::Graphics::RenderFrame()
 		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
 		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
 		s_dataBeingRenderedByRenderThread->textures[i]->DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->meshes[i]->DecrementReferenceCount();
 	}
 
-	//Clear the arbitrary number of sprites, effects and textures
+	//Clear the arbitrary number of sprites, effects, textures and meshes
 	s_dataBeingRenderedByRenderThread->effects.clear();
 	s_dataBeingRenderedByRenderThread->sprites.clear();
 	s_dataBeingRenderedByRenderThread->textures.clear();
+	s_dataBeingRenderedByRenderThread->meshes.clear();
 
 }
 
@@ -246,6 +279,19 @@ eae6320::cResult eae6320::Graphics::Initialize(const sInitializationParameters& 
 			// There is only a single per-frame constant buffer that is re-used
 			// and so it can be bound at initialization time and never unbound
 			s_constantBuffer_perFrame.Bind(
+				// In our class both vertex and fragment shaders use per-frame constant data
+				ShaderTypes::Vertex | ShaderTypes::Fragment);
+		}
+		else
+		{
+			EAE6320_ASSERT(false);
+			goto OnExit;
+		}
+		if (result = s_constantBuffer_perDrawCall.Initialize())
+		{
+			// There is only a single per-frame constant buffer that is re-used
+			// and so it can be bound at initialization time and never unbound
+			s_constantBuffer_perDrawCall.Bind(
 				// In our class both vertex and fragment shaders use per-frame constant data
 				ShaderTypes::Vertex | ShaderTypes::Fragment);
 		}
@@ -323,12 +369,14 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
 		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
 		s_dataBeingRenderedByRenderThread->textures[i]->DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->meshes[i]->DecrementReferenceCount();
 	}
 
 	//Clear the arbitrary number of sprites and effects
 	s_dataBeingRenderedByRenderThread->effects.clear();
 	s_dataBeingRenderedByRenderThread->sprites.clear();
 	s_dataBeingRenderedByRenderThread->textures.clear();
+	s_dataBeingRenderedByRenderThread->meshes.clear();
 
 	//Reset the arbitrary number of sprites and effects
 	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->effects.size(); i++)
@@ -336,15 +384,28 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 		s_dataBeingSubmittedByApplicationThread->effects[i]->DecrementReferenceCount();
 		s_dataBeingSubmittedByApplicationThread->sprites[i]->DecrementReferenceCount();
 		s_dataBeingSubmittedByApplicationThread->textures[i]->DecrementReferenceCount();
+		s_dataBeingSubmittedByApplicationThread->meshes[i]->DecrementReferenceCount();
 	}
 
 	//Clear the arbitrary number of sprites and effects
 	s_dataBeingSubmittedByApplicationThread->effects.clear();
 	s_dataBeingSubmittedByApplicationThread->sprites.clear();
 	s_dataBeingSubmittedByApplicationThread->textures.clear();
+	s_dataBeingSubmittedByApplicationThread->meshes.clear();
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();
+		if (!localResult)
+		{
+			EAE6320_ASSERT(false);
+			if (result)
+			{
+				result = localResult;
+			}
+		}
+	}
+	{
+		const auto localResult = s_constantBuffer_perDrawCall.CleanUp();
 		if (!localResult)
 		{
 			EAE6320_ASSERT(false);

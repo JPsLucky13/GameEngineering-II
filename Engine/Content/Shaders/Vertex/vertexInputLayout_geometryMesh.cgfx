@@ -1,0 +1,70 @@
+/*
+	This vertex shader is used to create a Direct3D vertex input layout object
+*/
+
+#include <Shaders/shaders.inc>
+
+#if defined( EAE6320_PLATFORM_D3D )
+
+// Entry Point
+//============
+
+void main(
+
+	// Input
+	//======
+
+	// The "semantics" (the keywords in all caps after the colon) are arbitrary,
+	// but must match the C call to CreateInputLayout()
+
+	in const float2 i_position : POSITION,
+	in const float4 i_color : COLOR0,
+	//in const float2 i_uv : TEXCOORD0,
+
+	// Output
+	//=======
+
+	// An SV_POSITION value must always be output from every vertex shader
+	// so that the GPU can figure out which fragments need to be shaded
+	out float4 o_position : SV_POSITION,
+	out float4 o_color : COLOR0
+	//out float2 o_uv : TEXCOORD0
+
+	)
+#elif defined( EAE6320_PLATFORM_GL )
+	// Input
+	//======
+
+	// The locations assigned are arbitrary
+	// but must match the C calls to glVertexAttribPointer()
+
+	// These values come from one of the VertexFormats::sGeometry that the vertex buffer was filled with in C code
+	layout( location = 0 ) in vec2 i_position;
+	layout( location = 1 ) in vec4 i_color;
+	//layout( location = 1 ) in vec2 i_uv;
+
+	// Output
+	//=======
+
+	// The vertex shader must always output a position value,
+	// but unlike HLSL where the value is explicit
+	// GLSL has an automatically-required variable named "gl_Position"
+
+	layout( location = 0 ) out vec4 o_color;
+	//layout( location = 0 ) out vec2 o_uv;
+
+	// Entry Point
+	//============
+
+	void main()
+
+#endif
+
+
+{
+	// The shader program is only used to generate a vertex input layout object;
+	// the actual shading code is never used
+	o_position = float4( i_position.x + g_position.x, i_position.y + g_position.y, 0.0, 1.0 );
+	o_color = i_color;
+	//o_uv = i_uv;
+}
