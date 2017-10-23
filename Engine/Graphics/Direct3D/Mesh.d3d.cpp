@@ -13,7 +13,7 @@
 
 // Initialization / Clean Up
 //--------------------------
-eae6320::cResult eae6320::Graphics::Mesh::Initialize(eae6320::Graphics::VertexFormats::sMesh i_vertexData[], uint16_t i_indexData[])
+eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount, uint16_t i_indexData[])
 {
 	auto result = eae6320::Results::Success;
 
@@ -93,37 +93,8 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(eae6320::Graphics::VertexFo
 	}
 	// Vertex Buffer
 	{
-		constexpr unsigned int triangleCount = 1;
-		constexpr unsigned int vertexCountPerTriangle = 3;
-		const auto vertexCount = triangleCount * vertexCountPerTriangle;
-		eae6320::Graphics::VertexFormats::sMesh vertexData[vertexCount];
-		{
-			//Position data
-			vertexData[0].x = i_vertexData[0].x;
-			vertexData[0].y = i_vertexData[0].y;
 
-			vertexData[1].x = i_vertexData[1].x;
-			vertexData[1].y = i_vertexData[1].y;
 
-			vertexData[2].x = i_vertexData[2].x;
-			vertexData[2].y = i_vertexData[2].y;	
-
-			//Color
-			vertexData[0].r = i_vertexData[0].r;
-			vertexData[0].b = i_vertexData[0].b;
-			vertexData[0].g = i_vertexData[0].g;
-			vertexData[0].a = i_vertexData[0].a;
-
-			vertexData[1].r = i_vertexData[1].r;
-			vertexData[1].b = i_vertexData[1].b;
-			vertexData[1].g = i_vertexData[1].g;
-			vertexData[1].a = i_vertexData[1].a;
-
-			vertexData[2].r = i_vertexData[2].r;
-			vertexData[2].b = i_vertexData[2].b;
-			vertexData[2].g = i_vertexData[2].g;
-			vertexData[2].a = i_vertexData[2].a;
-		}
 		D3D11_BUFFER_DESC bufferDescription{};
 		{
 			const auto bufferSize = vertexCount * sizeof(eae6320::Graphics::VertexFormats::sMesh);
@@ -138,7 +109,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(eae6320::Graphics::VertexFo
 
 		D3D11_SUBRESOURCE_DATA initialData{};
 		{
-			initialData.pSysMem = vertexData;
+			initialData.pSysMem = i_vertexData;
 			// (The other data members are ignored for non-texture buffers)
 		}
 
@@ -157,14 +128,8 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(eae6320::Graphics::VertexFo
 
 	// Index Buffer
 	{
-		m_indexCount += 3;
-		uint16_t indexData[3];
-		{
-			//Index data
-			indexData[0] = i_indexData[0];
-			indexData[1] = i_indexData[1];
-			indexData[2] = i_indexData[2];		
-		}
+		m_indexCount = indexCount;
+		
 
 		D3D11_BUFFER_DESC bufferDescription{};
 		{
@@ -179,7 +144,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(eae6320::Graphics::VertexFo
 		}
 		D3D11_SUBRESOURCE_DATA initialData{};
 		{
-			initialData.pSysMem = indexData;
+			initialData.pSysMem = i_indexData;
 			// (The other data members are ignored for non-texture buffers)
 		}
 

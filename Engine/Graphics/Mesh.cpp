@@ -9,7 +9,7 @@
 // Implementation
 //===============
 
-eae6320::cResult eae6320::Graphics::Mesh::Factory(Mesh* &o_mesh, eae6320::Graphics::VertexFormats::sMesh vertexData[], uint16_t indexData[])
+eae6320::cResult eae6320::Graphics::Mesh::Factory(Mesh* &o_mesh, unsigned int vertexCount,eae6320::Graphics::VertexFormats::sMesh vertexData[], unsigned int indexCount, uint16_t indexData[])
 {
 	auto result = Results::Success;
 
@@ -28,7 +28,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Factory(Mesh* &o_mesh, eae6320::Graphi
 	}
 
 	// Initialize the platform-specific graphics API sprite object
-	if (!(result = newMesh->Initialize(vertexData, indexData)))
+	if (!(result = newMesh->Initialize(vertexCount, vertexData, indexCount, indexData)))
 	{
 		EAE6320_ASSERTF(false, "Initialization of new mesh failed");
 		goto OnExit;

@@ -54,7 +54,7 @@ namespace eae6320
 
 			//Factory
 			//====
-			static cResult Factory(Mesh* &o_mesh, eae6320::Graphics::VertexFormats::sMesh i_vertexData[], uint16_t i_indexData[]);
+			static cResult Factory(Mesh* &o_mesh, unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount, uint16_t i_indexData[]);
 
 			//Delete
 			//====
@@ -70,6 +70,8 @@ namespace eae6320
 
 			//Data
 			//====
+			//The index count
+			unsigned int m_indexCount;
 
 #if defined( EAE6320_PLATFORM_D3D )
 			// A vertex buffer holds the data for each vertex
@@ -79,8 +81,7 @@ namespace eae6320
 			// D3D has an "input layout" object that associates the layout of the vertex format struct
 			// with the input from a vertex shader
 			ID3D11InputLayout* m_vertexInputLayout = nullptr;
-			//The index count
-			unsigned int m_indexCount;
+			
 
 
 #elif defined( EAE6320_PLATFORM_GL )
@@ -90,8 +91,6 @@ namespace eae6320
 			GLuint m_vertexArrayId = 0;
 			// An index buffer holds the data for each index
 			GLuint m_indexBufferId = 0;
-			//The index count
-			GLsizei m_indexCount;
 #endif
 			EAE6320_ASSETS_DECLAREREFERENCECOUNT();
 
@@ -99,7 +98,7 @@ namespace eae6320
 			//====
 
 			//centerPosX and centerPosY define the coordinates of the center of the sprite
-			eae6320::cResult Initialize(eae6320::Graphics::VertexFormats::sMesh vertexData[], uint16_t indexData[]);
+			eae6320::cResult Initialize(unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh vertexData[], unsigned int indexCount, uint16_t indexData[]);
 			eae6320::cResult CleanUp();
 
 			//Constructor

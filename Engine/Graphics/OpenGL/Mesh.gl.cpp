@@ -4,13 +4,14 @@
 
 #include <Engine\Asserts\Asserts.h>
 #include <Engine\Logging\Logging.h>
+#include <vector>
 
 // Implementation
 //===============
 
 // Initialization / Clean Up
 //--------------------------
-eae6320::cResult eae6320::Graphics::Mesh::Initialize(eae6320::Graphics::VertexFormats::sMesh i_vertexData[], uint16_t i_indexData[])
+eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount,eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount,uint16_t i_indexData[])
 {
 	auto result = eae6320::Results::Success;
 
@@ -69,6 +70,26 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(eae6320::Graphics::VertexFo
 		}
 	}
 
+	
+
+	// Assign the data to the buffer
+	{
+		const auto bufferSize = vertexCount * sizeof(eae6320::Graphics::VertexFormats::sMesh);
+		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
+		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(i_vertexData),
+			// In our class we won't ever read from the buffer
+			GL_STATIC_DRAW);
+		const auto errorCode = glGetError();
+		if (errorCode != GL_NO_ERROR)
+		{
+			result = eae6320::Results::Failure;
+			EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+			eae6320::Logging::OutputError("OpenGL failed to allocate the vertex buffer: %s",
+				reinterpret_cast<const char*>(gluErrorString(errorCode)));
+			goto OnExit;
+		}
+	}
+
 	// Create an index buffer object and make it active
 	{
 		constexpr GLsizei bufferCount = 1;
@@ -96,65 +117,34 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(eae6320::Graphics::VertexFo
 			goto OnExit;
 		}
 	}
-
-	// Assign the data to the buffer
-	{
-		constexpr unsigned int triangleCount = 1;
-		constexpr unsigned int vertexCountPerTriangle = 3;
-		const auto vertexCount = triangleCount * vertexCountPerTriangle;
-		eae6320::Graphics::VertexFormats::sMesh vertexData[vertexCount];
-		{
-			//Position data
-			vertexData[0].x = i_vertexData[0].x;
-			vertexData[0].y = i_vertexData[0].y;
-
-			vertexData[1].x = i_vertexData[1].x;
-			vertexData[1].y = i_vertexData[1].y;
-
-			vertexData[2].x = i_vertexData[2].x;
-			vertexData[2].y = i_vertexData[2].y;
-
-			//Color
-			vertexData[0].r = i_vertexData[0].r;
-			vertexData[0].b = i_vertexData[0].b;
-			vertexData[0].g = i_vertexData[0].g;
-			vertexData[0].a = i_vertexData[0].a;
-
-			vertexData[1].r = i_vertexData[1].r;
-			vertexData[1].b = i_vertexData[1].b;
-			vertexData[1].g = i_vertexData[1].g;
-			vertexData[1].a = i_vertexData[1].a;
-
-			vertexData[2].r = i_vertexData[2].r;
-			vertexData[2].b = i_vertexData[2].b;
-			vertexData[2].g = i_vertexData[2].g;
-			vertexData[2].a = i_vertexData[2].a;
-		}
-		const auto bufferSize = vertexCount * sizeof(eae6320::Graphics::VertexFormats::sMesh);
-		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
-		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(vertexData),
-			// In our class we won't ever read from the buffer
-			GL_STATIC_DRAW);
-		const auto errorCode = glGetError();
-		if (errorCode != GL_NO_ERROR)
-		{
-			result = eae6320::Results::Failure;
-			EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-			eae6320::Logging::OutputError("OpenGL failed to allocate the vertex buffer: %s",
-				reinterpret_cast<const char*>(gluErrorString(errorCode)));
-			goto OnExit;
-		}
-	}
 	// Assign the data to the index buffer
 	{
-		m_indexCount += 3;
+		m_indexCount = indexCount;
+		std::vector<uint16_t> newIndexData;
+		for (size_t i = 0; i < indexCount; i++)
+		{
+			//Swapp the values
+			if (i % 3 == 1)
+			{
+				newIndexData.push_back(i_indexData[i + 1]);
+				newIndexData.push_back(i_indexData[i]);
+				i += 1;
+			}
+			else
+			{
+				newIndexData.push_back(i_indexData[i]);
+			}
+
+		}
+
 		uint16_t indexData[3];
 		{
-			//Index data
-			indexData[0] = i_indexData[0];
-			indexData[2] = i_indexData[2];
-			indexData[1] = i_indexData[1];
+			for (size_t i = 0; i < indexCount; i++)
+			{
+				indexData[i] = newIndexData[i];
+			}
 		}
+
 		const auto bufferSize = m_indexCount * sizeof(uint16_t);
 		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(indexData),

@@ -32,6 +32,7 @@ void main(
 
 #elif defined( EAE6320_PLATFORM_GL )
 
+layout( location = 0 ) in vec4 i_color;
 //layout( location = 0 ) in vec2 i_uv;
 
 // Output

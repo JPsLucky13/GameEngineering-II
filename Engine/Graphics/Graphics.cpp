@@ -71,7 +71,10 @@ namespace
 		eae6320::Graphics::ConstantBufferFormats::sPerDrawCall constantData_perDrawCall;
 
 		//Meshes
-		std::vector<eae6320::Graphics::Mesh *> meshes;
+		std::vector<std::pair <eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *>> meshPairs;
+
+		//Mesh positions
+		std::vector<std::pair <float, float>> meshPositions;
 
 	};
 
@@ -152,17 +155,13 @@ void eae6320::Graphics::RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect
 
 void eae6320::Graphics::RenderMeshWithEffectAtPosition(Mesh * mesh, Effect * effect, float posX, float posY)
 {
-
-
 	mesh->IncrementReferenceCount();
 	effect->IncrementReferenceCount();
 
-	s_dataBeingSubmittedByApplicationThread->effects.push_back(effect);
-	s_dataBeingSubmittedByApplicationThread->meshes.push_back(mesh);
+	s_dataBeingSubmittedByApplicationThread->meshPairs.push_back(std::make_pair(mesh,effect));
 
-	auto& constantData_perDrawCall = s_dataBeingSubmittedByApplicationThread->constantData_perDrawCall;
-	constantData_perDrawCall.g_position.x = posX;
-	constantData_perDrawCall.g_position.y = posY;
+	s_dataBeingSubmittedByApplicationThread->meshPositions.push_back(std::make_pair(posX, posY));
+	
 }
 
 
@@ -218,15 +217,24 @@ void eae6320::Graphics::RenderFrame()
 	//Bind effects and draw sprites
 	{
 		
-		auto& constantData_perDrawCall = s_dataBeingRenderedByRenderThread->constantData_perDrawCall;
-		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
+		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->meshPairs.size(); i++)
 		{
+			auto& constantData_perDrawCall = s_dataBeingSubmittedByApplicationThread->constantData_perDrawCall;
+			constantData_perDrawCall.g_position.x = s_dataBeingRenderedByRenderThread->meshPositions[i].first;
+			constantData_perDrawCall.g_position.y = s_dataBeingRenderedByRenderThread->meshPositions[i].second;
 			s_constantBuffer_perDrawCall.Update(&constantData_perDrawCall);
+			s_dataBeingRenderedByRenderThread->meshPairs[i].second->Bind();
+			s_dataBeingRenderedByRenderThread->meshPairs[i].first->Draw();
+		}
+
+		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->sprites.size(); i++)
+		{
 			s_dataBeingRenderedByRenderThread->effects[i]->Bind();
 			s_dataBeingRenderedByRenderThread->textures[i]->Bind(0);
-			s_dataBeingRenderedByRenderThread->meshes[i]->Draw();
 			s_dataBeingRenderedByRenderThread->sprites[i]->Draw();
 		}
+
+
 	}
 
 	//Swap the buffers
@@ -236,17 +244,25 @@ void eae6320::Graphics::RenderFrame()
 	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
 	{
 		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
-		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
-		s_dataBeingRenderedByRenderThread->textures[i]->DecrementReferenceCount();
-		s_dataBeingRenderedByRenderThread->meshes[i]->DecrementReferenceCount();
 	}
-
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->sprites.size(); i++)
+	{
+		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
+	}
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->textures.size(); i++)
+	{
+		s_dataBeingRenderedByRenderThread->textures[i]->DecrementReferenceCount();
+	}
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->meshPairs.size(); i++)
+	{
+		s_dataBeingRenderedByRenderThread->meshPairs[i].first->DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->meshPairs[i].second->DecrementReferenceCount();
+	}
 	//Clear the arbitrary number of sprites, effects, textures and meshes
 	s_dataBeingRenderedByRenderThread->effects.clear();
 	s_dataBeingRenderedByRenderThread->sprites.clear();
 	s_dataBeingRenderedByRenderThread->textures.clear();
-	s_dataBeingRenderedByRenderThread->meshes.clear();
-
+	s_dataBeingRenderedByRenderThread->meshPairs.clear();
 }
 
 
@@ -367,31 +383,50 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->effects.size(); i++)
 	{
 		s_dataBeingRenderedByRenderThread->effects[i]->DecrementReferenceCount();
+	}
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->sprites.size(); i++)
+	{
 		s_dataBeingRenderedByRenderThread->sprites[i]->DecrementReferenceCount();
+	}
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->textures.size(); i++)
+	{
 		s_dataBeingRenderedByRenderThread->textures[i]->DecrementReferenceCount();
-		s_dataBeingRenderedByRenderThread->meshes[i]->DecrementReferenceCount();
+	}
+	for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->meshPairs.size(); i++)
+	{
+		s_dataBeingRenderedByRenderThread->meshPairs[i].first->DecrementReferenceCount();
+		s_dataBeingRenderedByRenderThread->meshPairs[i].second->DecrementReferenceCount();
 	}
 
 	//Clear the arbitrary number of sprites and effects
 	s_dataBeingRenderedByRenderThread->effects.clear();
 	s_dataBeingRenderedByRenderThread->sprites.clear();
 	s_dataBeingRenderedByRenderThread->textures.clear();
-	s_dataBeingRenderedByRenderThread->meshes.clear();
+	s_dataBeingRenderedByRenderThread->meshPairs.clear();
 
 	//Reset the arbitrary number of sprites and effects
 	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->effects.size(); i++)
 	{
 		s_dataBeingSubmittedByApplicationThread->effects[i]->DecrementReferenceCount();
-		s_dataBeingSubmittedByApplicationThread->sprites[i]->DecrementReferenceCount();
-		s_dataBeingSubmittedByApplicationThread->textures[i]->DecrementReferenceCount();
-		s_dataBeingSubmittedByApplicationThread->meshes[i]->DecrementReferenceCount();
 	}
-
+	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->sprites.size(); i++)
+	{
+		s_dataBeingSubmittedByApplicationThread->sprites[i]->DecrementReferenceCount();
+	}
+	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->textures.size(); i++)
+	{
+		s_dataBeingSubmittedByApplicationThread->textures[i]->DecrementReferenceCount();
+	}
+	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->meshPairs.size(); i++)
+	{
+		s_dataBeingSubmittedByApplicationThread->meshPairs[i].first->DecrementReferenceCount();
+		s_dataBeingSubmittedByApplicationThread->meshPairs[i].second->DecrementReferenceCount();
+	}
 	//Clear the arbitrary number of sprites and effects
 	s_dataBeingSubmittedByApplicationThread->effects.clear();
 	s_dataBeingSubmittedByApplicationThread->sprites.clear();
 	s_dataBeingSubmittedByApplicationThread->textures.clear();
-	s_dataBeingSubmittedByApplicationThread->meshes.clear();
+	s_dataBeingSubmittedByApplicationThread->meshPairs.clear();
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();
