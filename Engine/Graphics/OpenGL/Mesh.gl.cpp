@@ -120,34 +120,22 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount,ea
 	// Assign the data to the index buffer
 	{
 		m_indexCount = indexCount;
-		std::vector<uint16_t> newIndexData;
 		for (size_t i = 0; i < indexCount; i++)
 		{
 			//Swapp the values
 			if (i % 3 == 1)
 			{
-				newIndexData.push_back(i_indexData[i + 1]);
-				newIndexData.push_back(i_indexData[i]);
+				uint16_t value1 = i_indexData[i];
+				i_indexData[i] = i_indexData[i+1];
+				i_indexData[i + 1] = value1;
 				i += 1;
 			}
-			else
-			{
-				newIndexData.push_back(i_indexData[i]);
-			}
 
-		}
-
-		uint16_t indexData[3];
-		{
-			for (size_t i = 0; i < indexCount; i++)
-			{
-				indexData[i] = newIndexData[i];
-			}
 		}
 
 		const auto bufferSize = m_indexCount * sizeof(uint16_t);
 		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(indexData),
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(i_indexData),
 			// In our class we won't ever read from the buffer
 			GL_STATIC_DRAW);
 		const auto errorCode = glGetError();
@@ -203,7 +191,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount,ea
 		// 4 uint8_t == 4 bytes
 		// Offset = 4
 		{
-			constexpr GLuint vertexElementLocation = 0;
+			constexpr GLuint vertexElementLocation = 1;
 			constexpr GLint elementCount = 4;
 			constexpr GLboolean notNormalized = GL_TRUE;
 			glVertexAttribPointer(vertexElementLocation, elementCount, GL_UNSIGNED_BYTE, notNormalized, stride,

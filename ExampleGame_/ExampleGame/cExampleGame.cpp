@@ -69,7 +69,7 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 	//Render the mesh with its effect
 	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[0], effects[2], 0.0f, 0.0f);
 	
-	//eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[1], effects[2], -1.0f, -0.5f);
+	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[1], effects[2], -1.0f, -0.5f);
 
 	//User specify's the background clear color
 	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
@@ -193,13 +193,13 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 							  1, 4, 3};
 
 
-	/*result = eae6320::Graphics::Mesh::Factory(newMesh,5,vertexData,9,indexData);
+	result = eae6320::Graphics::Mesh::Factory(newMesh,5,vertexData,9,indexData);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
 		return Results::Failure;
 	}
-	meshes.push_back(newMesh);*/
+	meshes.push_back(newMesh);
 
 	//Vertex data for the second mesh
 	eae6320::Graphics::VertexFormats::sMesh vertexData2[3];
