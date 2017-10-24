@@ -73,8 +73,8 @@ namespace
 		//Meshes
 		std::vector<std::pair <eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *>> meshPairs;
 
-		//Mesh positions
-		std::vector<std::pair <float, float>> meshPositions;
+		//MeshPositions
+		std::vector<std::pair <float,float>> meshPositions;
 
 	};
 
@@ -159,9 +159,7 @@ void eae6320::Graphics::RenderMeshWithEffectAtPosition(Mesh * mesh, Effect * eff
 	effect->IncrementReferenceCount();
 
 	s_dataBeingSubmittedByApplicationThread->meshPairs.push_back(std::make_pair(mesh,effect));
-
 	s_dataBeingSubmittedByApplicationThread->meshPositions.push_back(std::make_pair(posX, posY));
-	
 }
 
 
@@ -216,14 +214,15 @@ void eae6320::Graphics::RenderFrame()
 
 	//Bind effects and draw sprites
 	{
-		
+
 		for (size_t i = 0; i < s_dataBeingRenderedByRenderThread->meshPairs.size(); i++)
 		{
+			s_dataBeingRenderedByRenderThread->meshPairs[i].second->Bind();
 			auto& constantData_perDrawCall = s_dataBeingSubmittedByApplicationThread->constantData_perDrawCall;
+			
 			constantData_perDrawCall.g_position.x = s_dataBeingRenderedByRenderThread->meshPositions[i].first;
 			constantData_perDrawCall.g_position.y = s_dataBeingRenderedByRenderThread->meshPositions[i].second;
 			s_constantBuffer_perDrawCall.Update(&constantData_perDrawCall);
-			s_dataBeingRenderedByRenderThread->meshPairs[i].second->Bind();
 			s_dataBeingRenderedByRenderThread->meshPairs[i].first->Draw();
 		}
 
@@ -233,7 +232,6 @@ void eae6320::Graphics::RenderFrame()
 			s_dataBeingRenderedByRenderThread->textures[i]->Bind(0);
 			s_dataBeingRenderedByRenderThread->sprites[i]->Draw();
 		}
-
 
 	}
 
@@ -263,6 +261,7 @@ void eae6320::Graphics::RenderFrame()
 	s_dataBeingRenderedByRenderThread->sprites.clear();
 	s_dataBeingRenderedByRenderThread->textures.clear();
 	s_dataBeingRenderedByRenderThread->meshPairs.clear();
+	s_dataBeingRenderedByRenderThread->meshPositions.clear();
 }
 
 
@@ -403,6 +402,7 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	s_dataBeingRenderedByRenderThread->sprites.clear();
 	s_dataBeingRenderedByRenderThread->textures.clear();
 	s_dataBeingRenderedByRenderThread->meshPairs.clear();
+	s_dataBeingRenderedByRenderThread->meshPositions.clear();
 
 	//Reset the arbitrary number of sprites and effects
 	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->effects.size(); i++)
@@ -427,6 +427,7 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	s_dataBeingSubmittedByApplicationThread->sprites.clear();
 	s_dataBeingSubmittedByApplicationThread->textures.clear();
 	s_dataBeingSubmittedByApplicationThread->meshPairs.clear();
+	s_dataBeingSubmittedByApplicationThread->meshPositions.clear();
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();

@@ -56,6 +56,44 @@ void eae6320::cExampleGame::UpdateBasedOnTime(const float i_elapsedSecondCount_s
 
 }
 
+void eae6320::cExampleGame::UpdateSimulationBasedOnInput()
+{
+
+	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Right))
+	{
+		velocity.x = 1.0f;
+	}
+
+
+	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Left))
+	{
+		velocity.x = -1.0f;
+	}
+
+	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Up))
+	{
+		velocity.y = 1.0f;
+	}
+
+	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Down))
+	{
+		velocity.y = -1.0f;
+	}
+	else
+	{
+		velocity.x = 0.0f;
+		velocity.y = 0.0f;
+	
+	}
+
+}
+
+void eae6320::cExampleGame::UpdateSimulationBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate)
+{
+	position.x += velocity.x * i_elapsedSecondCount_sinceLastUpdate;
+	position.y += velocity.y * i_elapsedSecondCount_sinceLastUpdate;
+}
+
 
 void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate)
 {
@@ -66,10 +104,13 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 		eae6320::Graphics::RenderSpriteWithEffectAndTexture(sprites[i],effects[i], textures[i]);
 	}
 
+	//position.x += velocity.x * i_elapsedSecondCount_sinceLastSimulationUpdate;
+	//position.y += velocity.y * i_elapsedSecondCount_sinceLastSimulationUpdate;
+
 	//Render the mesh with its effect
-	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[0], effects[2], 0.0f, 0.0f);
+	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[0], effects[2], position.x, position.y);
 	
-	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[1], effects[2], -1.0f, -0.5f);
+	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[1], effects[2], -0.5f, -0.5f);
 
 	//User specify's the background clear color
 	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
@@ -213,22 +254,22 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 	vertexData2[1].x = 0.5f;
 	vertexData2[1].y = -0.5f;
-	vertexData2[1].r = 255;
+	vertexData2[1].r = 0;
 	vertexData2[1].g = 0;
-	vertexData2[1].b = 0;
+	vertexData2[1].b = 255;
 	vertexData2[1].a = 255;
 
 	vertexData2[2].x = 0.0f;
 	vertexData2[2].y = 0.0f;
-	vertexData2[2].r = 255;
+	vertexData2[2].r = 0;
 	vertexData2[2].g = 0;
 	vertexData2[2].b = 0;
 	vertexData2[2].a = 255;
 
 	//Index data
-	uint16_t indexData2[3] = { 0 ,1 ,2 };
+	uint16_t indexData2[3] = { 0 ,2 ,1 };
 
-	result = eae6320::Graphics::Mesh::Factory(newMesh, 3, vertexData, 3, indexData2);
+	result = eae6320::Graphics::Mesh::Factory(newMesh, 3, vertexData2, 3, indexData2);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);

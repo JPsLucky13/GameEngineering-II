@@ -4,8 +4,6 @@
 
 #include <Shaders/shaders.inc>
 
-DeclareColorTexture(g_color_texture,0);
-DeclareSamplerState(g_color_samplerState,0);
 
 #if defined( EAE6320_PLATFORM_D3D )
 

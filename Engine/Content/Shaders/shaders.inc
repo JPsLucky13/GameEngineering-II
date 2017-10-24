@@ -78,7 +78,8 @@ DeclareConstantBuffer(g_constantBuffer_perDrawCall,2)
 	float4 g_position;
 };
 
-
+DeclareColorTexture(g_color_texture,0);
+DeclareSamplerState(g_color_samplerState,0);
 
 
 
