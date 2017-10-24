@@ -31,7 +31,7 @@ void eae6320::cExampleGame::UpdateBasedOnInput()
 		{
 			isKeyPressedAlready = true;
 
-			std::swap(textures[0], textures[1]);
+			//std::swap(textures[0], textures[1]);
 		}
 		
 	}
@@ -49,11 +49,49 @@ void eae6320::cExampleGame::UpdateBasedOnTime(const float i_elapsedSecondCount_s
 
 	if (counter > timeToSwitchTexture)
 	{
-		std::swap(textures[2], textures[3]);
+		std::swap(textures[0], textures[1]);
 		counter = 0.0f;
 
 	}
 
+}
+
+void eae6320::cExampleGame::UpdateSimulationBasedOnInput()
+{
+
+	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Right))
+	{
+		velocity.x = 1.0f;
+	}
+
+
+	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Left))
+	{
+		velocity.x = -1.0f;
+	}
+
+	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Up))
+	{
+		velocity.y = 1.0f;
+	}
+
+	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Down))
+	{
+		velocity.y = -1.0f;
+	}
+	else
+	{
+		velocity.x = 0.0f;
+		velocity.y = 0.0f;
+	
+	}
+
+}
+
+void eae6320::cExampleGame::UpdateSimulationBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate)
+{
+	position.x += velocity.x * i_elapsedSecondCount_sinceLastUpdate;
+	position.y += velocity.y * i_elapsedSecondCount_sinceLastUpdate;
 }
 
 
@@ -65,6 +103,14 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 	{
 		eae6320::Graphics::RenderSpriteWithEffectAndTexture(sprites[i],effects[i], textures[i]);
 	}
+
+	//position.x += velocity.x * i_elapsedSecondCount_sinceLastSimulationUpdate;
+	//position.y += velocity.y * i_elapsedSecondCount_sinceLastSimulationUpdate;
+
+	//Render the mesh with its effect
+	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[0], effects[2], position.x, position.y);
+	
+	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[1], effects[2], -0.5f, -0.5f);
 
 	//User specify's the background clear color
 	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
@@ -80,16 +126,8 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 
 	//Call to factory function for effects
-	auto result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite1", eae6320::Graphics::RenderStates::AlphaTransparency);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
 	
-	effects.push_back(newEffect);
-	
-	result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
+	auto result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
@@ -108,7 +146,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 	effects.push_back(newEffect);
 
-	result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
+	result = eae6320::Graphics::Effect::Factory(newEffect, "mesh", "mesh", eae6320::Graphics::RenderStates::AlphaTransparency);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
@@ -117,49 +155,10 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 	effects.push_back(newEffect);
 
-	result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
 
-	effects.push_back(newEffect);
 
 	//Call to factory function for sprites
-	result = eae6320::Graphics::Sprite::Factory(newSprite, 0.5f, 0.5f, 0.5f, 0.5f);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	sprites.push_back(newSprite);
-
-	result = eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, -0.5f, 1.0f, 1.0f);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	sprites.push_back(newSprite);
-
-	result = eae6320::Graphics::Sprite::Factory(newSprite, -0.5f, 0.5f, 0.25f, 0.25f);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	sprites.push_back(newSprite);
-
-	result = eae6320::Graphics::Sprite::Factory(newSprite, 0.5f, -0.5f, 0.5f, 0.5f);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	sprites.push_back(newSprite);
-
-	result = eae6320::Graphics::Sprite::Factory(newSprite, 0.5f, 0.0f, 0.5f, 0.5f);
+	result = eae6320::Graphics::Sprite::Factory(newSprite, -0.75f, 0.75f, 0.5f, 0.5f);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
@@ -169,33 +168,6 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 	//Texture creation
 	eae6320::Graphics::cTexture::Handle newTexture;
-
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture1.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
-
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture2.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
-
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture3.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
 	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture4.png", newTexture);
 	if (!result)
@@ -214,6 +186,96 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	}
 	textureHandles.push_back(newTexture);
 	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
+
+	//Mesh creation
+	eae6320::Graphics::Mesh * newMesh;
+
+	//Vertex data
+	eae6320::Graphics::VertexFormats::sMesh vertexData[5];
+
+	vertexData[0].x = 0.0f;
+	vertexData[0].y = 0.0f;
+	vertexData[0].r = 255;
+	vertexData[0].g = 0;
+	vertexData[0].b = 0;
+	vertexData[0].a = 255;
+
+	vertexData[1].x = 0.0f;
+	vertexData[1].y = 0.5f;
+	vertexData[1].r = 0;
+	vertexData[1].g = 255;
+	vertexData[1].b = 0;
+	vertexData[1].a = 255;
+
+	vertexData[2].x = 0.5f;
+	vertexData[2].y = 0.0f;
+	vertexData[2].r = 0;
+	vertexData[2].g = 0;
+	vertexData[2].b = 255;
+	vertexData[2].a = 255;
+
+	vertexData[3].x = 0.5f;
+	vertexData[3].y = 0.5f;
+	vertexData[3].r = 255;
+	vertexData[3].g = 255;
+	vertexData[3].b = 0;
+	vertexData[3].a = 255;
+
+	vertexData[4].x = 0.25f;
+	vertexData[4].y = 0.75f;
+	vertexData[4].r = 0;
+	vertexData[4].g = 255;
+	vertexData[4].b = 255;
+	vertexData[4].a = 255;
+
+	//Index data
+	uint16_t indexData[9] = { 0 ,1 ,2, 
+							  1, 3, 2,
+							  1, 4, 3};
+
+
+	result = eae6320::Graphics::Mesh::Factory(newMesh,5,vertexData,9,indexData);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	meshes.push_back(newMesh);
+
+	//Vertex data for the second mesh
+	eae6320::Graphics::VertexFormats::sMesh vertexData2[3];
+
+	vertexData2[0].x = -0.5f;
+	vertexData2[0].y = -0.5f;
+	vertexData2[0].r = 255;
+	vertexData2[0].g = 0;
+	vertexData2[0].b = 0;
+	vertexData2[0].a = 255;
+
+	vertexData2[1].x = 0.5f;
+	vertexData2[1].y = -0.5f;
+	vertexData2[1].r = 0;
+	vertexData2[1].g = 0;
+	vertexData2[1].b = 255;
+	vertexData2[1].a = 255;
+
+	vertexData2[2].x = 0.0f;
+	vertexData2[2].y = 0.0f;
+	vertexData2[2].r = 0;
+	vertexData2[2].g = 0;
+	vertexData2[2].b = 0;
+	vertexData2[2].a = 255;
+
+	//Index data
+	uint16_t indexData2[3] = { 0 ,2 ,1 };
+
+	result = eae6320::Graphics::Mesh::Factory(newMesh, 3, vertexData2, 3, indexData2);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	meshes.push_back(newMesh);
 
 
 	return Results::Success;
@@ -236,6 +298,12 @@ eae6320::cResult eae6320::cExampleGame::CleanUp()
 	for (size_t i = 0; i < textures.size(); i++)
 	{
 		eae6320::Graphics::cTexture::s_manager.Release(textureHandles[i]);
+	}
+
+	//Destroy the meshes
+	for (size_t i = 0; i < meshes.size(); i++)
+	{
+		eae6320::Graphics::Mesh::Delete(meshes[i]);
 	}
 
 	return Results::Success;

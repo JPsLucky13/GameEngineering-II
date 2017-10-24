@@ -11,6 +11,7 @@
 #include <Engine/Application/cbApplication.h>
 #include <Engine/Results/Results.h>
 #include <Engine/Graphics/Graphics.h>
+#include <Engine/Math/sVector.h>
 
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
@@ -89,6 +90,19 @@ namespace eae6320
 		//--------------
 		std::vector<eae6320::Graphics::cTexture::Handle> textureHandles;
 		std::vector<eae6320::Graphics::cTexture *> textures;
+
+		// Meshes
+		//--------------
+		std::vector<eae6320::Graphics::Mesh *> meshes;
+
+		// Movable Mesh position
+		//--------------
+		Math::sVector position;
+
+		// Movable Mesh Velocity
+		//--------------
+		Math::sVector velocity;
+
 #endif
 
 		// Run
@@ -96,6 +110,9 @@ namespace eae6320
 
 		virtual void UpdateBasedOnInput() override;
 		virtual void UpdateBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate) override;
+
+		virtual void UpdateSimulationBasedOnInput() override;
+		virtual void UpdateSimulationBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate) override;
 
 		// Submit render data
 

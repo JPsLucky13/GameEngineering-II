@@ -75,10 +75,11 @@ DeclareConstantBuffer(g_constantBuffer_perMaterial,1)
 DeclareConstantBuffer(g_constantBuffer_perDrawCall,2)
 {
 	// This is a placeholder to prevent an empty constant buffer declaration
-	float4 DUMMY;
+	float4 g_position;
 };
 
-
+DeclareColorTexture(g_color_texture,0);
+DeclareSamplerState(g_color_samplerState,0);
 
 
 
