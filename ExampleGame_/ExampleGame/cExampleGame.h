@@ -11,7 +11,7 @@
 #include <Engine/Application/cbApplication.h>
 #include <Engine/Results/Results.h>
 #include <Engine/Graphics/Graphics.h>
-#include <Engine/Math/sVector.h>
+#include <Engine/Physics/sRigidBodyState.h>
 
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
@@ -95,13 +95,17 @@ namespace eae6320
 		//--------------
 		std::vector<eae6320::Graphics::Mesh *> meshes;
 
-		// Movable Mesh position
+		// Camera
 		//--------------
-		Math::sVector position;
+		eae6320::Graphics::Camera * gameCamera;
+		eae6320::Physics::sRigidBodyState cameraRigidBody;
 
-		// Movable Mesh Velocity
+		// Movable Mesh sRigidbody
 		//--------------
-		Math::sVector velocity;
+		eae6320::Physics::sRigidBodyState meshRigidBody;
+
+		// Static Mesh
+		Math::sVector floorPosition;
 
 #endif
 

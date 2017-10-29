@@ -45,6 +45,7 @@
 	#define DeclareColorTexture( i_name, i_id ) Texture2D i_name : register( t##i_id )
 	#define DeclareSamplerState( i_name, i_id ) SamplerState i_name : register( s##i_id )
 	#define CalculateSampledColor(i_texture, i_samplerState,i_uv) i_texture.Sample( i_samplerState, i_uv )
+	#define CalculateMatrixVectorMultiplication(i_matrix, i_vector) mul(i_matrix,i_vector)
 
 #elif defined( EAE6320_PLATFORM_GL )
 
@@ -52,6 +53,7 @@
 	#define DeclareColorTexture( i_name, i_id ) layout( binding = i_id ) uniform sampler2D i_name
 	#define DeclareSamplerState( i_name, i_id ) 
 	#define CalculateSampledColor(i_texture, i_samplerState,i_uv) texture2D(i_texture, i_uv )
+	#define CalculateMatrixVectorMultiplication(i_matrix, i_vector) i_matrix * i_vector
 
 #endif
 
@@ -61,10 +63,12 @@
 
 DeclareConstantBuffer( g_constantBuffer_perFrame, 0 )
 {
-	float g_elapsedSecondCount_systemTime;
-	float g_elapsedSecondCount_simulationTime;
-	// For float4 alignment
-	float2 g_padding;
+  float4x4 g_transform_worldToCamera;
+  float4x4 g_transform_cameraToProjected;
+
+  float g_elapsedSecondCount_systemTime;
+  float g_elapsedSecondCount_simulationTime;
+  float2 g_padding; // For float4 alignment
 };
 
 DeclareConstantBuffer(g_constantBuffer_perMaterial,1)
@@ -74,12 +78,10 @@ DeclareConstantBuffer(g_constantBuffer_perMaterial,1)
 
 DeclareConstantBuffer(g_constantBuffer_perDrawCall,2)
 {
-	// This is a placeholder to prevent an empty constant buffer declaration
-	float4 g_position;
+	 float4x4 g_transform_localToWorld;
 };
 
 DeclareColorTexture(g_color_texture,0);
 DeclareSamplerState(g_color_samplerState,0);
-
 
 

@@ -167,6 +167,15 @@ void eae6320::Graphics::View::ClearColor(float red, float green, float blue, flo
 	}
 }
 
+void eae6320::Graphics::View::ClearDepthBuffer(float i_depth)
+{
+	EAE6320_ASSERT(m_depthStencilView);
+	constexpr uint8_t stencilValue = 0; // Arbitrary if stencil isn't used
+	auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
+	EAE6320_ASSERT(direct3dImmediateContext);
+	direct3dImmediateContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, i_depth, stencilValue);
+}
+
 void eae6320::Graphics::View::ViewSwapBuffers()
 {
 	// Everything has been drawn to the "back buffer", which is just an image in memory.

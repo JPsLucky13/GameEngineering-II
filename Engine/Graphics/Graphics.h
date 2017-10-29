@@ -13,11 +13,14 @@
 #include "Sprite.h"
 #include "Effect.h"
 #include "Mesh.h"
+#include "Camera.h"
 #include "cTexture.h"
 #include "cTexture.h"
 
 #include <cstdint>
 #include <Engine/Results/Results.h>
+#include <Engine/Math/sVector.h>
+#include <Engine/Math/Functions.h>
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
 	#include <Engine/Windows/Includes.h>
@@ -62,7 +65,9 @@ namespace eae6320
 
 		void RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture * texture);
 
-		void RenderMeshWithEffectAtPosition(Mesh * mesh, Effect * effect, float posX, float posY);
+		void RenderMeshWithEffectAtPosition(Mesh * mesh, Effect * effect, Math::sVector position);
+
+		void SubmitCamera(Camera * camera);
 
 
 		// Initialization / Clean Up
