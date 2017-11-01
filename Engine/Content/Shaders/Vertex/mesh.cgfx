@@ -21,7 +21,7 @@ void main(
 	// but must match the C call to CreateInputLayout()
 
 	// These values come from one of the VertexFormats::sGeometry that the vertex buffer was filled with in C code
-	in const float2 i_position : POSITION,
+	in const float3 i_position : POSITION,
 	in const float4 i_color : COLOR0,
 	//in const float2 i_uv : TEXCOORD0,
 
@@ -44,7 +44,7 @@ void main(
 	// but must match the C calls to glVertexAttribPointer()
 
 	// These values come from one of the VertexFormats::sGeometry that the vertex buffer was filled with in C code
-	layout( location = 0 ) in vec2 i_position;
+	layout( location = 0 ) in vec3 i_position;
 	layout( location = 1 ) in vec4 i_color;
 	//layout( location = 1 ) in vec2 i_uv;
 
@@ -68,7 +68,13 @@ void main(
 	// Calculate the position of this vertex on screen
 	{
 
-		o_position = float4(i_position.x + g_position.x, i_position.y + g_position.y, 0.0, 1.0);
+		float4 vertexPosition_local = float4( i_position, 1.0 );
+		float4 vertexPosition_world = CalculateMatrixVectorMultiplication(g_transform_localToWorld,vertexPosition_local);
+		float4 vertexPosition_camera = CalculateMatrixVectorMultiplication(g_transform_worldToCamera,vertexPosition_world);
+		float4 vertexPosition_projected = CalculateMatrixVectorMultiplication(g_transform_cameraToProjected,vertexPosition_camera);
+
+
+		o_position = vertexPosition_projected;
 		o_color = i_color;
 
 		//// This example shader sets the "out" position directly from the "in" position:

@@ -41,14 +41,14 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 				// Slot 0
 
 				// POSITION
-				// 2 floats == 8 bytes
+				// 3 floats == 12 bytes
 				// Offset = 0
 				{
 					auto& positionElement = layoutDescription[0];
 
 					positionElement.SemanticName = "POSITION";
 					positionElement.SemanticIndex = 0;	// (Semantics without modifying indices at the end can always use zero)
-					positionElement.Format = DXGI_FORMAT_R32G32_FLOAT;
+					positionElement.Format = DXGI_FORMAT_R32G32B32_FLOAT;
 					positionElement.InputSlot = 0;
 					positionElement.AlignedByteOffset = offsetof(eae6320::Graphics::VertexFormats::sMesh, x);
 					positionElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -59,7 +59,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 
 				//COLOR
 				//4 uint8_t == 4 bytes
-				//Offset = 8
+				//Offset = 12
 				{
 					auto& positionElement = layoutDescription[1];
 
@@ -201,20 +201,6 @@ void eae6320::Graphics::Mesh::Draw()
 		EAE6320_ASSERT(direct3dImmediateContext);
 		direct3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
-	// Render triangles from the currently-bound vertex buffer
-	{
-		// As of this comment only a single triangle is drawn
-		// (you will have to update this code in future assignments!)
-		constexpr unsigned int triangleCount = 1;
-		constexpr unsigned int vertexCountPerTriangle = 3;
-		constexpr auto vertexCountToRender = triangleCount * vertexCountPerTriangle;
-		// It's possible to start rendering primitives in the middle of the stream
-		constexpr unsigned int indexOfFirstVertexToRender = 0;
-		auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
-		EAE6320_ASSERT(direct3dImmediateContext);
-		direct3dImmediateContext->Draw(vertexCountToRender, indexOfFirstVertexToRender);
-
-	}
 
 	{
 		auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;
@@ -224,6 +210,8 @@ void eae6320::Graphics::Mesh::Draw()
 		const unsigned int offset = 0;
 		direct3dImmediateContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, offset);
 	}
+
+	// Render triangles from the currently-bound index buffer
 
 	{
 		auto* const direct3dImmediateContext = sContext::g_context.direct3dImmediateContext;

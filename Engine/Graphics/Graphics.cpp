@@ -74,7 +74,7 @@ namespace
 		std::vector<std::pair <eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *>> meshPairs;
 
 		//MeshPositions
-		std::vector<std::pair <float,float>> meshPositions;
+		std::vector<eae6320::Math::sVector> meshPositions;
 
 	};
 
@@ -153,13 +153,19 @@ void eae6320::Graphics::RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect
 		s_dataBeingSubmittedByApplicationThread->textures.push_back(texture);
 }
 
-void eae6320::Graphics::RenderMeshWithEffectAtPosition(Mesh * mesh, Effect * effect, float posX, float posY)
+void eae6320::Graphics::RenderMeshWithEffectAtPosition(Mesh * mesh, Effect * effect, Math::sVector position)
 {
 	mesh->IncrementReferenceCount();
 	effect->IncrementReferenceCount();
 
 	s_dataBeingSubmittedByApplicationThread->meshPairs.push_back(std::make_pair(mesh,effect));
-	s_dataBeingSubmittedByApplicationThread->meshPositions.push_back(std::make_pair(posX, posY));
+	s_dataBeingSubmittedByApplicationThread->meshPositions.push_back(position);
+}
+
+void eae6320::Graphics::SubmitCamera(Camera * camera)
+{
+	s_dataBeingSubmittedByApplicationThread->constantData_perFrame.g_transform_worldToCamera = eae6320::Math::cMatrix_transformation::CreateWorldToCameraTransform(camera->m_cameraRigidBody.orientation, camera->m_cameraRigidBody.position);
+	s_dataBeingSubmittedByApplicationThread->constantData_perFrame.g_transform_cameraToProjected = eae6320::Math::cMatrix_transformation::CreateCameraToProjectedTransform_perspective(Math::ConvertDegreesToRadians(camera->m_verticalFieldOfView_inRadians),camera->m_aspectRatio, camera->m_z_nearPlane,camera->m_z_farPlane);
 }
 
 
@@ -212,6 +218,11 @@ void eae6320::Graphics::RenderFrame()
 
 	}
 
+	//Clear the depth buffer
+	{
+		view.ClearDepthBuffer(1.0f);
+	}
+
 	//Bind effects and draw sprites
 	{
 
@@ -219,9 +230,7 @@ void eae6320::Graphics::RenderFrame()
 		{
 			s_dataBeingRenderedByRenderThread->meshPairs[i].second->Bind();
 			auto& constantData_perDrawCall = s_dataBeingSubmittedByApplicationThread->constantData_perDrawCall;
-			
-			constantData_perDrawCall.g_position.x = s_dataBeingRenderedByRenderThread->meshPositions[i].first;
-			constantData_perDrawCall.g_position.y = s_dataBeingRenderedByRenderThread->meshPositions[i].second;
+			constantData_perDrawCall.g_transform_localToWorld = Math::cMatrix_transformation(Math::cQuaternion(), s_dataBeingRenderedByRenderThread->meshPositions[i]);
 			s_constantBuffer_perDrawCall.Update(&constantData_perDrawCall);
 			s_dataBeingRenderedByRenderThread->meshPairs[i].first->Draw();
 		}

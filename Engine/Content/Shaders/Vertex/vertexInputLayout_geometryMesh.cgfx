@@ -17,7 +17,7 @@ void main(
 	// The "semantics" (the keywords in all caps after the colon) are arbitrary,
 	// but must match the C call to CreateInputLayout()
 
-	in const float2 i_position : POSITION,
+	in const float3 i_position : POSITION,
 	in const float4 i_color : COLOR0,
 	//in const float2 i_uv : TEXCOORD0,
 
@@ -64,7 +64,12 @@ void main(
 {
 	// The shader program is only used to generate a vertex input layout object;
 	// the actual shading code is never used
-	o_position = float4( i_position.x + g_position.x, i_position.y + g_position.y, 0.0, 1.0 );
+	float4 vertexPosition_local = float4( i_position, 1.0 );
+	float4 vertexPosition_world = CalculateMatrixVectorMultiplication(g_transform_localToWorld,vertexPosition_local);
+	float4 vertexPosition_camera = CalculateMatrixVectorMultiplication(g_transform_worldToCamera,vertexPosition_world);
+	float4 vertexPosition_projected = CalculateMatrixVectorMultiplication(g_transform_cameraToProjected,vertexPosition_camera);
+
+	o_position = vertexPosition_projected;
 	o_color = i_color;
 	//o_uv = i_uv;
 }

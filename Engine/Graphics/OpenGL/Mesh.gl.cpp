@@ -155,11 +155,11 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount,ea
 		const auto stride = static_cast<GLsizei>(sizeof(eae6320::Graphics::VertexFormats::sMesh));
 
 		// Position (0)
-		// 2 floats == 8 bytes
+		// 3 floats == 12 bytes
 		// Offset = 0
 		{
 			constexpr GLuint vertexElementLocation = 0;
-			constexpr GLint elementCount = 2;
+			constexpr GLint elementCount = 3;
 			constexpr GLboolean notNormalized = GL_FALSE;	// The given floats should be used as-is
 			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, notNormalized, stride,
 				reinterpret_cast<GLvoid*>(offsetof(eae6320::Graphics::VertexFormats::sMesh, x)));
@@ -189,7 +189,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount,ea
 
 		// Color (1)
 		// 4 uint8_t == 4 bytes
-		// Offset = 4
+		// Offset = 12
 		{
 			constexpr GLuint vertexElementLocation = 1;
 			constexpr GLint elementCount = 4;
@@ -239,23 +239,8 @@ void eae6320::Graphics::Mesh::Draw()
 			glBindVertexArray(m_vertexArrayId);
 			EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
 		}
-		// Render triangles from the currently-bound vertex buffer
-		{
-			// The mode defines how to interpret multiple vertices as a single "primitive";
-			// a triangle list is defined
-			// (meaning that every primitive is a triangle and will be defined by three vertices)
-			constexpr GLenum mode = GL_TRIANGLES;
-			// It's possible to start rendering primitives in the middle of the stream
-			constexpr GLint indexOfFirstVertexToRender = 0;
-			// As of this comment we are only drawing a single triangle
-			// (you will have to update this code in future assignments!)
-			constexpr unsigned int triangleCount = 1;
-			constexpr unsigned int vertexCountPerTriangle = 3;
-			constexpr auto vertexCountToRender = triangleCount * vertexCountPerTriangle;
-			glDrawArrays(mode, indexOfFirstVertexToRender, vertexCountToRender);
-			EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
-		}
 
+		// Render triangles from the currently-bound index buffer
 		{
 			// The mode defines how to interpret multiple vertices as a single "primitive";
 			// a triangle list is defined

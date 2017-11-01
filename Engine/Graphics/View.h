@@ -46,6 +46,7 @@ namespace eae6320
 			void CleanUp();
 
 			void ClearColor(float red, float green, float blue, float alpha);
+			void ClearDepthBuffer(float i_depth);
 
 			void ViewSwapBuffers();
 
