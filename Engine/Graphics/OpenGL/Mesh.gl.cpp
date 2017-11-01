@@ -239,23 +239,8 @@ void eae6320::Graphics::Mesh::Draw()
 			glBindVertexArray(m_vertexArrayId);
 			EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
 		}
-		// Render triangles from the currently-bound vertex buffer
-		{
-			// The mode defines how to interpret multiple vertices as a single "primitive";
-			// a triangle list is defined
-			// (meaning that every primitive is a triangle and will be defined by three vertices)
-			constexpr GLenum mode = GL_TRIANGLES;
-			// It's possible to start rendering primitives in the middle of the stream
-			constexpr GLint indexOfFirstVertexToRender = 0;
-			// As of this comment we are only drawing a single triangle
-			// (you will have to update this code in future assignments!)
-			constexpr unsigned int triangleCount = 1;
-			constexpr unsigned int vertexCountPerTriangle = 3;
-			constexpr auto vertexCountToRender = triangleCount * vertexCountPerTriangle;
-			glDrawArrays(mode, indexOfFirstVertexToRender, vertexCountToRender);
-			EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
-		}
 
+		// Render triangles from the currently-bound index buffer
 		{
 			// The mode defines how to interpret multiple vertices as a single "primitive";
 			// a triangle list is defined

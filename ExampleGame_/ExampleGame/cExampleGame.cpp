@@ -56,91 +56,107 @@ void eae6320::cExampleGame::UpdateBasedOnTime(const float i_elapsedSecondCount_s
 
 void eae6320::cExampleGame::UpdateSimulationBasedOnInput()
 {
+
+	isAKeyPressed = false;
+
 	//Camera Movement
 	if (UserInput::IsKeyPressed('D'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.velocity.x = 1.0f;
 	}
-	else if (UserInput::IsKeyPressed('A'))
+	if (UserInput::IsKeyPressed('A'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.velocity.x = -1.0f;
 	}
-	else if (UserInput::IsKeyPressed('E'))
+	if (UserInput::IsKeyPressed('E'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.velocity.z = -1.0f;
 	}
-	else if (UserInput::IsKeyPressed('Q'))
+	if (UserInput::IsKeyPressed('Q'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.velocity.z = 1.0f;
 	}
-	else if (UserInput::IsKeyPressed('W'))
+	if (UserInput::IsKeyPressed('W'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.velocity.y = 1.0f;
 	}
-	else if (UserInput::IsKeyPressed('S'))
+	if (UserInput::IsKeyPressed('S'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.velocity.y = -1.0f;
 	}
 
 	//Camera Rotation
-	else if (UserInput::IsKeyPressed('T'))
+	if (UserInput::IsKeyPressed('T'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.angularSpeed = 0.1f;
 		gameCamera->m_cameraRigidBody.angularVelocity_axis_local = Math::sVector(0.0f, 1.0f, 0.0f);
 	}
-	else if (UserInput::IsKeyPressed('G'))
+	if (UserInput::IsKeyPressed('G'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.angularSpeed = -0.1f;
 		gameCamera->m_cameraRigidBody.angularVelocity_axis_local = Math::sVector(0.0f, 1.0f, 0.0f);
 	}
-	else if (UserInput::IsKeyPressed('Y'))
+	if (UserInput::IsKeyPressed('Y'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.angularSpeed = 0.1f;
 		gameCamera->m_cameraRigidBody.angularVelocity_axis_local = Math::sVector(1.0f, 0.0f, 0.0f);
 	}
-	else if (UserInput::IsKeyPressed('H'))
+	if (UserInput::IsKeyPressed('H'))
 	{
+		isAKeyPressed = true;
 		gameCamera->m_cameraRigidBody.angularSpeed = -0.1f;
 		gameCamera->m_cameraRigidBody.angularVelocity_axis_local = Math::sVector(1.0f, 0.0f, 0.0f);
 	}
 
-	else
-	{
-		gameCamera->m_cameraRigidBody.velocity.x = 0.0f;
-		gameCamera->m_cameraRigidBody.velocity.y = 0.0f;
-		gameCamera->m_cameraRigidBody.velocity.z = 0.0f;
-		gameCamera->m_cameraRigidBody.angularSpeed = 0.0f;
-
-	}
 
 	//Mesh Movement
 	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Right))
 	{
+		isAKeyPressed = true;
 		meshRigidBody.velocity.x = 1.0f;
 	}
 
 
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Left))
+	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Left))
 	{
+		isAKeyPressed = true;
 		meshRigidBody.velocity.x = -1.0f;
 	}
 
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Up))
+	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Up))
 	{
+		isAKeyPressed = true;
 		meshRigidBody.velocity.y = 1.0f;
 	}
 
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Down))
+	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Down))
 	{
+		isAKeyPressed = true;
 		meshRigidBody.velocity.y = -1.0f;
 	}
-	else
+
+	if(!isAKeyPressed)
 	{
+		//Stop mesh movement
 		meshRigidBody.velocity.x = 0.0f;
 		meshRigidBody.velocity.y = 0.0f;
-	
-	}
 
+
+		//Stop Camera movement and rotation
+		gameCamera->m_cameraRigidBody.velocity.x = 0.0f;
+		gameCamera->m_cameraRigidBody.velocity.y = 0.0f;
+		gameCamera->m_cameraRigidBody.velocity.z = 0.0f;
+		gameCamera->m_cameraRigidBody.angularSpeed = 0.0f;
+	}
 }
 
 void eae6320::cExampleGame::UpdateSimulationBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate)

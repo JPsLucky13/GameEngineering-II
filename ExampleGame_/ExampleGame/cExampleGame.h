@@ -72,6 +72,7 @@ namespace eae6320
 		// KeyPressState
 		//-------------
 		bool isKeyPressedAlready;
+		bool isAKeyPressed;
 
 		// Elapsed Time
 		//-------------
