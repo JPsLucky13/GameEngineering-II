@@ -21,6 +21,8 @@ This file declares the external interface for the effect
 #include <cstdint>
 #include <Engine/Results/Results.h>
 #include <Engine/Assets/ReferenceCountedAssets.h>
+#include <Engine/Assets/cHandle.h>
+#include <Engine/Assets/cManager.h>
 
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
@@ -40,6 +42,15 @@ namespace eae6320
 			//==========
 
 		public:
+
+			// Access
+			//-------
+
+			using Handle = Assets::cHandle<Mesh>;
+			static Assets::cManager<Mesh> s_manager;
+
+			static cResult Load(const char* const i_path, Mesh*& o_mesh);
+
 			EAE6320_ASSETS_DECLAREDELETEDREFERENCECOUNTEDFUNCTIONS(Mesh);
 
 
@@ -51,10 +62,6 @@ namespace eae6320
 
 			// Functions
 			//====
-
-			//Factory
-			//====
-			static cResult Factory(Mesh* &o_mesh, unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount, uint16_t i_indexData[]);
 
 			//Delete
 			//====
@@ -72,6 +79,7 @@ namespace eae6320
 			//====
 			//The index count
 			unsigned int m_indexCount;
+
 
 #if defined( EAE6320_PLATFORM_D3D )
 			// A vertex buffer holds the data for each vertex
@@ -98,7 +106,7 @@ namespace eae6320
 			//====
 
 			//centerPosX and centerPosY define the coordinates of the center of the sprite
-			eae6320::cResult Initialize(unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh vertexData[], unsigned int indexCount, uint16_t indexData[]);
+			eae6320::cResult Initialize(unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount, uint16_t i_indexData[]);
 			eae6320::cResult CleanUp();
 
 			//Constructor

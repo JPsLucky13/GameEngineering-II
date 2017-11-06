@@ -11,7 +11,7 @@
 
 // Initialization / Clean Up
 //--------------------------
-eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount,eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount,uint16_t i_indexData[])
+eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount, uint16_t i_indexData[])
 {
 	auto result = eae6320::Results::Success;
 

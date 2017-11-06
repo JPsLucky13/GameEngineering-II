@@ -1,8 +1,6 @@
 #include "../Mesh.h"
 #include "Includes.h"
-#include "../sContext.h"
-
-
+#include "../sContext.h"	
 
 #include <Engine\Asserts\Asserts.h>
 #include <Engine/Platform/Platform.h>
