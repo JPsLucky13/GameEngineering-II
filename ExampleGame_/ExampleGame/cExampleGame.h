@@ -72,7 +72,14 @@ namespace eae6320
 		// KeyPressState
 		//-------------
 		bool isKeyPressedAlready;
-		bool isAKeyPressed;
+		
+		// KeyPressForMovableMesh
+		//-------------
+		bool isAKeyPressedForMovableMesh;
+
+		// KeyPressForCamera
+		//-------------
+		bool isAKeyPressedForCamera;
 
 		// Elapsed Time
 		//-------------

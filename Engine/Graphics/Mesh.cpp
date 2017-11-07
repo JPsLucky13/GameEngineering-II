@@ -6,6 +6,7 @@
 #include <Engine\Asserts\Asserts.h>
 #include <Engine/Platform/Platform.h>
 #include <External/Lua/Includes.h>
+#include <Engine/Logging/Logging.h>
 #include <iostream>
 
 // Helper Function Declarations
@@ -15,8 +16,8 @@ namespace
 {
 	unsigned int s_vertexCount;
 	unsigned int s_indexCount;
-	eae6320::Graphics::VertexFormats::sMesh s_vertexData[10000];
-	uint16_t s_indexData[10000];
+	eae6320::Graphics::VertexFormats::sMesh  * s_vertexData = NULL;
+	uint16_t * s_indexData = NULL;
 
 	eae6320::cResult LoadTableValues(lua_State& io_luaState);
 
@@ -88,14 +89,14 @@ namespace
 		else
 		{
 			result = eae6320::Results::InvalidFile;
-			std::cerr << "The value at \"" << key << "\" must be a table "
-				"(instead of a " << luaL_typename(&io_luaState, -1) << ")" << std::endl;
+			EAE6320_ASSERT(result);
+			eae6320::Logging::OutputError("The value at %s must be a table instead of a %s.", key, luaL_typename(&io_luaState, -1));
 			goto OnExit;
 		}
 
 	OnExit:
 
-		// Pop the textures table
+		// Pop the vertices table
 		lua_pop(&io_luaState, 1);
 
 		return result;
@@ -117,6 +118,7 @@ namespace
 
 		//Iterating through every vertex value
 		s_vertexCount = static_cast<unsigned int>(luaL_len(&io_luaState, -1));
+		s_vertexData = new eae6320::Graphics::VertexFormats::sMesh[s_vertexCount];
 		for (unsigned int i = 1; i <= s_vertexCount; ++i)
 		{
 			lua_pushinteger(&io_luaState, i);
@@ -128,11 +130,57 @@ namespace
 			lua_pushstring(&io_luaState, key);
 			lua_gettable(&io_luaState, -2);
 
+
+			if (!lua_istable(&io_luaState, -1))
+			{
+				result = eae6320::Results::InvalidFile;
+				EAE6320_ASSERT(result);
+				eae6320::Logging::OutputError("The value at %s must be a table instead of a %s.", key, luaL_typename(&io_luaState, -1));
+				return result;
+			}
+
+			// First, then, we will make sure that a value (_any_ value) existed for the key:
+			if (lua_isnil(&io_luaState, -1))
+			{
+				
+				result = eae6320::Results::InvalidFile;
+				EAE6320_ASSERT(result);
+				eae6320::Logging::OutputError("No value for %s was found in the asset table", key);
+				lua_pop(&io_luaState, 1);
+				// Now the only thing on the stack is the asset table at -1,
+				// and the calling function will deal with this
+				// (regardless of whether this function succeeds or fails).
+				return result;
+			}
+
 				{
 					//Get x
 					constexpr auto* const key2 = "x";
 					lua_pushstring(&io_luaState, key2);
 					lua_gettable(&io_luaState, -2);
+
+
+					// First, then, we will make sure that a value (_any_ value) existed for the key:
+					if (lua_isnil(&io_luaState, -1))
+					{
+
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("No value for %s was found in the asset table", key2);
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
+					if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+					{
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("The value for %s must be a number (instead of a %s)", key2, luaL_typename(&io_luaState, -1));
+						// Pop the value
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
 
 					s_vertexData[i - 1].x = static_cast<float>(lua_tonumber(&io_luaState, -1));
 
@@ -143,6 +191,27 @@ namespace
 					lua_pushstring(&io_luaState, key3);
 					lua_gettable(&io_luaState, -2);
 
+					// First, then, we will make sure that a value (_any_ value) existed for the key:
+					if (lua_isnil(&io_luaState, -1))
+					{
+
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("No value for %s was found in the asset table", key3);
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
+					if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+					{
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("The value for %s must be a number (instead of a %s)", key3, luaL_typename(&io_luaState, -1));
+						// Pop the value
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
 					s_vertexData[i - 1].y = static_cast<float>(lua_tonumber(&io_luaState, -1));
 
 					lua_pop(&io_luaState, 1);
@@ -151,6 +220,27 @@ namespace
 					constexpr auto* const key4 = "z";
 					lua_pushstring(&io_luaState, key4);
 					lua_gettable(&io_luaState, -2);
+
+					// First, then, we will make sure that a value (_any_ value) existed for the key:
+					if (lua_isnil(&io_luaState, -1))
+					{
+
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("No value for %s was found in the asset table", key4);
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
+					if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+					{
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("The value for %s must be a number (instead of a %s)", key4, luaL_typename(&io_luaState, -1));
+						// Pop the value
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
 
 					s_vertexData[i - 1].z = static_cast<float>(lua_tonumber(&io_luaState, -1));
 
@@ -167,11 +257,55 @@ namespace
 				lua_pushstring(&io_luaState, key);
 				lua_gettable(&io_luaState, -2);
 
+				if (!lua_istable(&io_luaState, -1))
+				{
+					result = eae6320::Results::InvalidFile;
+					EAE6320_ASSERT(result);
+					eae6320::Logging::OutputError("The value at %s must be a table instead of a %s.", key, luaL_typename(&io_luaState, -1));
+					return eae6320::Results::InvalidFile;
+				}
+
+				// First, then, we will make sure that a value (_any_ value) existed for the key:
+				if (lua_isnil(&io_luaState, -1))
+				{
+
+					result = eae6320::Results::InvalidFile;
+					EAE6320_ASSERT(result);
+					eae6320::Logging::OutputError("No value for %s was found in the asset table", key);
+					lua_pop(&io_luaState, 1);
+					// Now the only thing on the stack is the asset table at -1,
+					// and the calling function will deal with this
+					// (regardless of whether this function succeeds or fails).
+					return result;
+				}
+
 				{
 					//Get r 
 					constexpr auto* const key2 = "r";
 					lua_pushstring(&io_luaState, key2);
 					lua_gettable(&io_luaState, -2);
+
+
+					// First, then, we will make sure that a value (_any_ value) existed for the key:
+					if (lua_isnil(&io_luaState, -1))
+					{
+
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("No value for %s was found in the asset table", key2);
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
+					if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+					{
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("The value for %s must be a number (instead of a %s)", key2, luaL_typename(&io_luaState, -1));
+						// Pop the value
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
 
 					s_vertexData[i - 1].r = static_cast<uint8_t>(lua_tonumber(&io_luaState, -1) * 255.0f);
 
@@ -182,6 +316,28 @@ namespace
 					lua_pushstring(&io_luaState, key3);
 					lua_gettable(&io_luaState, -2);
 
+
+					// First, then, we will make sure that a value (_any_ value) existed for the key:
+					if (lua_isnil(&io_luaState, -1))
+					{
+
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("No value for %s was found in the asset table", key3);
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
+					if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+					{
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("The value for %s must be a number (instead of a %s)", key3, luaL_typename(&io_luaState, -1));
+						// Pop the value
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
 					s_vertexData[i - 1].g = static_cast<uint8_t>(lua_tonumber(&io_luaState, -1) * 255.0f);
 
 					lua_pop(&io_luaState, 1);
@@ -191,6 +347,28 @@ namespace
 					lua_pushstring(&io_luaState, key4);
 					lua_gettable(&io_luaState, -2);
 
+
+					// First, then, we will make sure that a value (_any_ value) existed for the key:
+					if (lua_isnil(&io_luaState, -1))
+					{
+
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("No value for %s was found in the asset table", key4);
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
+					if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+					{
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("The value for %s must be a number (instead of a %s)", key4, luaL_typename(&io_luaState, -1));
+						// Pop the value
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
 					s_vertexData[i - 1].b = static_cast<uint8_t>(lua_tonumber(&io_luaState, -1) * 255.0f);
 
 					lua_pop(&io_luaState, 1);
@@ -199,6 +377,28 @@ namespace
 					constexpr auto* const key5 = "a";
 					lua_pushstring(&io_luaState, key5);
 					lua_gettable(&io_luaState, -2);
+
+
+					// First, then, we will make sure that a value (_any_ value) existed for the key:
+					if (lua_isnil(&io_luaState, -1))
+					{
+
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("No value for %s was found in the asset table", key5);
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
+
+					if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+					{
+						result = eae6320::Results::InvalidFile;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("The value for %s must be a number (instead of a %s)", key5, luaL_typename(&io_luaState, -1));
+						// Pop the value
+						lua_pop(&io_luaState, 3);
+						return result;
+					}
 
 					s_vertexData[i - 1].a = static_cast<uint8_t>(lua_tonumber(&io_luaState, -1) * 255.0f);
 
@@ -234,9 +434,9 @@ namespace
 		}
 		else
 		{
-			result = eae6320::Results::InvalidFile;
-			std::cerr << "The value at \"" << key << "\" must be a table "
-				"(instead of a " << luaL_typename(&io_luaState, -1) << ")" << std::endl;
+			result = result = eae6320::Results::InvalidFile;
+			EAE6320_ASSERT(result);
+			eae6320::Logging::OutputError("The value at %s must be a table instead of a %s.", key, luaL_typename(&io_luaState, -1));
 			goto OnExit;
 		}
 
@@ -256,6 +456,7 @@ namespace
 
 		//Iterating through every vertex value
 		s_indexCount = static_cast<unsigned int>(luaL_len(&io_luaState, -1));
+		s_indexData = new uint16_t[s_indexCount];
 		for (unsigned int i = 1; i <= s_indexCount; ++i)
 		{
 			lua_pushinteger(&io_luaState, i);
@@ -281,7 +482,8 @@ namespace
 			if (!luaState)
 			{
 				result = eae6320::Results::OutOfMemory;
-				std::cerr << "Failed to create a new Lua state" << std::endl;
+				EAE6320_ASSERT(result);
+				eae6320::Logging::OutputError("Failed to create a lua state");
 				goto OnExit;
 			}
 		}
@@ -316,9 +518,12 @@ namespace
 					// A correct asset file _must_ return a table
 					if (!lua_istable(luaState, -1))
 					{
+
 						result = eae6320::Results::InvalidFile;
-						std::cerr << "Asset files must return a table (instead of a " <<
-							luaL_typename(luaState, -1) << ")" << std::endl;
+						EAE6320_ASSERT(result);
+						eae6320::Logging::OutputError("Asset files must return a table(instead of a %s)", luaL_typename(luaState, -1));
+
+
 						// Pop the returned non-table value
 						lua_pop(luaState, 1);
 						goto OnExit;
@@ -327,8 +532,8 @@ namespace
 				else
 				{
 					result = eae6320::Results::InvalidFile;
-					std::cerr << "Asset files must return a single table (instead of " <<
-						returnedValueCount << " values)" << std::endl;
+					EAE6320_ASSERT(result);
+					eae6320::Logging::OutputError("Asset files must return a table(instead of %d)", returnedValueCount);
 					// Pop every value that was returned
 					lua_pop(luaState, returnedValueCount);
 					goto OnExit;
@@ -382,14 +587,15 @@ eae6320::cResult eae6320::Graphics::Mesh::Load(const char* const i_path, Mesh*& 
 {
 
 	auto result = eae6320::Results::Success;
-
+	Mesh* newMesh = nullptr;
     const char* const path = i_path;
+
 	if (!(result = LoadAsset(path)))
 	{
-		return result;
+		goto OnExit;
 	}
 
-	Mesh* newMesh = nullptr;
+	
 
 	// Allocate a new mesh
 	{
@@ -413,6 +619,12 @@ eae6320::cResult eae6320::Graphics::Mesh::Load(const char* const i_path, Mesh*& 
 			EAE6320_ASSERTF(false, "Initialization of new texture failed");
 			goto OnExit;
 		}
+
+		// Delete the arrays of vertices and indices
+		delete []s_vertexData;
+		s_vertexData = NULL;
+		delete[]s_indexData;
+		s_indexData = NULL;
 	}
 
 OnExit:
