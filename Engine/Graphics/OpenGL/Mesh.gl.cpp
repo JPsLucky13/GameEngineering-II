@@ -120,18 +120,18 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 	// Assign the data to the index buffer
 	{
 		m_indexCount = indexCount;
-		for (size_t i = 0; i < indexCount; i++)
-		{
-			//Swapp the values
-			if (i % 3 == 1)
-			{
-				uint16_t value1 = i_indexData[i];
-				i_indexData[i] = i_indexData[i+1];
-				i_indexData[i + 1] = value1;
-				i += 1;
-			}
+		//for (size_t i = 0; i < indexCount; i++)
+		//{
+		//	//Swapp the values
+		//	if (i % 3 == 1)
+		//	{
+		//		uint16_t value1 = i_indexData[i];
+		//		i_indexData[i] = i_indexData[i+1];
+		//		i_indexData[i + 1] = value1;
+		//		i += 1;
+		//	}
 
-		}
+		//}
 
 		const auto bufferSize = m_indexCount * sizeof(uint16_t);
 		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
