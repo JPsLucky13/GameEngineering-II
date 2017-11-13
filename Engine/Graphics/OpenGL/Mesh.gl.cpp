@@ -120,18 +120,6 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 	// Assign the data to the index buffer
 	{
 		m_indexCount = indexCount;
-		//for (size_t i = 0; i < indexCount; i++)
-		//{
-		//	//Swapp the values
-		//	if (i % 3 == 1)
-		//	{
-		//		uint16_t value1 = i_indexData[i];
-		//		i_indexData[i] = i_indexData[i+1];
-		//		i_indexData[i + 1] = value1;
-		//		i += 1;
-		//	}
-
-		//}
 
 		const auto bufferSize = m_indexCount * sizeof(uint16_t);
 		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
@@ -187,9 +175,12 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 			}
 		}
 
+
+		
+
 		// Color (1)
 		// 4 uint8_t == 4 bytes
-		// Offset = 12
+		// Offset = 20
 		{
 			constexpr GLuint vertexElementLocation = 1;
 			constexpr GLint elementCount = 4;
@@ -215,6 +206,39 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 				result = eae6320::Results::Failure;
 				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				eae6320::Logging::OutputError("OpenGL failed to set the COLOR vertex attribute at location %u: %s",
+					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				goto OnExit;
+			}
+		}
+
+		// Texture
+		// 2 floats == 8 bytes
+		// Offset = 12
+		{
+			constexpr GLuint vertexElementLocation = 2;
+			constexpr GLint elementCount = 2;
+			constexpr GLboolean notNormalized = GL_FALSE;	// The given floats should be used as-is
+			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, notNormalized, stride,
+				reinterpret_cast<GLvoid*>(offsetof(eae6320::Graphics::VertexFormats::sMesh, u)));
+			const auto errorCode = glGetError();
+			if (errorCode == GL_NO_ERROR)
+			{
+				glEnableVertexAttribArray(vertexElementLocation);
+				const GLenum errorCode = glGetError();
+				if (errorCode != GL_NO_ERROR)
+				{
+					result = eae6320::Results::Failure;
+					EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+					eae6320::Logging::OutputError("OpenGL failed to enable the TEXTURE vertex attribute at location %u: %s",
+						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+					goto OnExit;
+				}
+			}
+			else
+			{
+				result = eae6320::Results::Failure;
+				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				eae6320::Logging::OutputError("OpenGL failed to set the TEXTURE vertex attribute at location %u: %s",
 					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				goto OnExit;
 			}

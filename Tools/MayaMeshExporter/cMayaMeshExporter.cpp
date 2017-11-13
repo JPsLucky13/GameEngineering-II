@@ -228,6 +228,8 @@ MStatus eae6320::cMayaMeshExporter::writer( const MFileObject& i_file, const MSt
 	}
 }
 
+
+
 // Helper Function Definitions
 //============================
 
@@ -789,34 +791,38 @@ namespace
 			fout << "return\n"
 				"{\n"
 
-				"vertices = {\n";
+				"\t\t\tvertices = {\n";
 				for (size_t v = 0; v < i_vertexArray.size(); v++)
 				{
-					fout << "{\n"
-						"position = {\n"
+					fout << "\t\t\t{\n"
 
-						"x = " << i_vertexArray[v].vertex.x << ",\n"
-						"y = " << i_vertexArray[v].vertex.y << ",\n"
-						"z = " << i_vertexArray[v].vertex.z << ",\n"
+						"\t\t\t\tposition = {\n"
+						"\t\t\t\t\t\tx = " << i_vertexArray[v].vertex.x << ",\n"
+						"\t\t\t\t\t\ty = " << i_vertexArray[v].vertex.y << ",\n"
+						"\t\t\t\t\t\tz = " << i_vertexArray[v].vertex.z << ",\n"
+						"\t\t\t\t},\n"
 
-						"},\n"
+						"\t\t\t\tcolor = {\n"
+						"\t\t\t\t\t\tr = " << i_vertexArray[v].vertex.r << ",\n"
+						"\t\t\t\t\t\tg = " << i_vertexArray[v].vertex.g << ",\n"
+						"\t\t\t\t\t\tb = " << i_vertexArray[v].vertex.b << ",\n"
+						"\t\t\t\t\t\ta = " << i_vertexArray[v].vertex.a << ",\n"
+						"\t\t\t\t},\n"
 
-						"color = {\n"
-						"r = " << i_vertexArray[v].vertex.r << ",\n"
-						"g = " << i_vertexArray[v].vertex.g << ",\n"
-						"b = " << i_vertexArray[v].vertex.b << ",\n"
-						"a = " << i_vertexArray[v].vertex.a << ",\n"
-						"},\n"
-						"},\n";
+						"\t\t\t\ttexture = {\n"
+						"\t\t\t\t\t\tu = " << i_vertexArray[v].vertex.u << ",\n"
+						"\t\t\t\t\t\tv = " << i_vertexArray[v].vertex.v << ",\n"
+						"\t\t\t\t},\n"
+						"\t\t\t},\n";
 				}
-				fout << "},\n"
+				fout << "\t\t\t},\n"
 
-					"indices = {\n";
+					"\t\t\tindices = {\n";
 				for (size_t i = 0; i < i_indexArray.size(); i++)
 				{
 					fout << i_indexArray[i] << ",";
 				}
-				fout << "},\n";
+				fout << "\t\t\t},\n";
 					// Write out the data using your mesh file format
 			
 			// Close table
