@@ -46,11 +46,16 @@ namespace eae6320
 				// POSITION
 				// 3 floats == 12 bytes
 				// Offset = 0
-				float x, y,z;
+
+				//TEXCOORD0
+				//2 floats == 8 bytes
+				//Offest = 12
+
+				float x, y,z,u,v;
 
 				//COLOR0
 				//4 uint8_t == 4 bytes
-				//Offest = 12
+				//Offest = 20
 				uint8_t r, g, b, a;
 			};
 		}

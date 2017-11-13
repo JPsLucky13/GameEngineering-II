@@ -65,7 +65,7 @@ namespace eae6320
 
 		void RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture * texture);
 
-		void RenderMeshWithEffectAtPosition(Mesh * mesh, Effect * effect, Math::sVector position);
+		void RenderMeshWithEffectAndTextureAtPosition(Mesh * mesh, Effect * effect, cTexture * texture, Math::sVector position);
 
 		void SubmitCamera(Camera * camera);
 

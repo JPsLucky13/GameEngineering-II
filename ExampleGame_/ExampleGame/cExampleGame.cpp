@@ -185,8 +185,9 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 
 	//Render the mesh with its effect
 	
-	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[0], effects[2], meshRigidBody.position);
-	eae6320::Graphics::RenderMeshWithEffectAtPosition(meshes[1], effects[2], floorPosition);
+	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[0], effects[2], textures[2],meshRigidBody.position);
+	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[1], effects[2], textures[3],floorPosition);
+	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[2], effects[2], textures[4], secondStaticMeshPosition);
 
 	//Submit the camera
 	eae6320::Graphics::SubmitCamera(gameCamera);
@@ -216,6 +217,11 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	floorPosition.x = 0.0f;
 	floorPosition.y = -1.0f;
 	floorPosition.z = 0.0f;
+
+	//Second static mesh position
+	secondStaticMeshPosition.x = -1.0f;
+	secondStaticMeshPosition.y = 0.0f;
+	secondStaticMeshPosition.z = 0.0f;
 
 	//Effect and sprite pointers
 	eae6320::Graphics::Effect * newEffect;
@@ -284,10 +290,37 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	textureHandles.push_back(newTexture);
 	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture6.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textureHandles.push_back(newTexture);
+	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture3.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textureHandles.push_back(newTexture);
+	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture1.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textureHandles.push_back(newTexture);
+	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
+
 	//Mesh creation
 	eae6320::Graphics::Mesh::Handle newMesh;
 
-	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/MovableMesh.fbx",newMesh);
+	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/MovableMesh.fbx", newMesh);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
@@ -297,6 +330,15 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	meshes.push_back(eae6320::Graphics::Mesh::s_manager.Get(newMesh));
 
 	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/StaticMesh.fbx", newMesh);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	meshHandles.push_back(newMesh);
+	meshes.push_back(eae6320::Graphics::Mesh::s_manager.Get(newMesh));
+
+	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/SecondStaticMesh.fbx", newMesh);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);

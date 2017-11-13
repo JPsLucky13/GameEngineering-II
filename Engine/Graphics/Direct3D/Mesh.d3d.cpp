@@ -33,7 +33,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 			// (by using so-called "semantic" names so that, for example,
 			// "POSITION" here matches with "POSITION" in shader code).
 			// Note that OpenGL uses arbitrarily assignable number IDs to do the same thing.
-			constexpr unsigned int vertexElementCount = 2;
+			constexpr unsigned int vertexElementCount = 3;
 			D3D11_INPUT_ELEMENT_DESC layoutDescription[vertexElementCount] = {};
 			{
 				// Slot 0
@@ -53,11 +53,14 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 					positionElement.InstanceDataStepRate = 0;	// (Must be zero for per-vertex data)
 				}
 
+				
+
+
 				// Slot 0
 
 				//COLOR
 				//4 uint8_t == 4 bytes
-				//Offset = 12
+				//Offset = 20
 				{
 					auto& positionElement = layoutDescription[1];
 
@@ -69,6 +72,22 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 					positionElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 					positionElement.InstanceDataStepRate = 0;	// (Must be zero for per-vertex data)
 				}
+
+				//TEXCOORD
+				//2 floats == 8 bytes
+				//Offset = 12
+				{
+					auto& positionElement = layoutDescription[2];
+
+					positionElement.SemanticName = "TEXCOORD";
+					positionElement.SemanticIndex = 0;	// (Semantics without modifying indices at the end can always use zero)
+					positionElement.Format = DXGI_FORMAT_R32G32_FLOAT;
+					positionElement.InputSlot = 0;
+					positionElement.AlignedByteOffset = offsetof(eae6320::Graphics::VertexFormats::sMesh, u);
+					positionElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+					positionElement.InstanceDataStepRate = 0;	// (Must be zero for per-vertex data)
+				}
+
 			}
 
 			const auto d3dResult = direct3dDevice->CreateInputLayout(layoutDescription, vertexElementCount,
@@ -107,6 +126,15 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 
 		D3D11_SUBRESOURCE_DATA initialData{};
 		{
+
+			//Vertex data is being assigned
+			for (size_t i = 0; i < vertexCount; i++)
+			{
+				//Alter the v value
+				i_vertexData[i].v = 1.0f - i_vertexData[i].v;
+			}
+
+
 			initialData.pSysMem = i_vertexData;
 			// (The other data members are ignored for non-texture buffers)
 		}
@@ -142,6 +170,21 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 		}
 		D3D11_SUBRESOURCE_DATA initialData{};
 		{
+			//Index data is being assigned
+			for (size_t i = 0; i < indexCount; i++)
+			{
+				//Swapp the values
+				if (i % 3 == 1)
+				{
+					uint16_t value1 = i_indexData[i];
+					i_indexData[i] = i_indexData[i+1];
+					i_indexData[i + 1] = value1;
+					i += 1;
+				}
+
+			}
+
+
 			initialData.pSysMem = i_indexData;
 			// (The other data members are ignored for non-texture buffers)
 		}

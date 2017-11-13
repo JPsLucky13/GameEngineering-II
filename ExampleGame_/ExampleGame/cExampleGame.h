@@ -116,6 +116,9 @@ namespace eae6320
 		// Static Mesh
 		Math::sVector floorPosition;
 
+		// Second Static Mesh
+		Math::sVector secondStaticMeshPosition;
+
 #endif
 
 		// Run

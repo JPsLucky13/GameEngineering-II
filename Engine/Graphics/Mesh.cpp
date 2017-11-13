@@ -408,6 +408,103 @@ namespace
 				lua_pop(&io_luaState, 1);
 			}
 
+			{
+			//Get Texture table 
+
+			constexpr auto* const key = "texture";
+			lua_pushstring(&io_luaState, key);
+			lua_gettable(&io_luaState, -2);
+
+			if (!lua_istable(&io_luaState, -1))
+			{
+				result = eae6320::Results::InvalidFile;
+				EAE6320_ASSERT(result);
+				eae6320::Logging::OutputError("The value at %s must be a table instead of a %s.", key, luaL_typename(&io_luaState, -1));
+				return eae6320::Results::InvalidFile;
+			}
+
+			// First, then, we will make sure that a value (_any_ value) existed for the key:
+			if (lua_isnil(&io_luaState, -1))
+			{
+
+				result = eae6320::Results::InvalidFile;
+				EAE6320_ASSERT(result);
+				eae6320::Logging::OutputError("No value for %s was found in the asset table", key);
+				lua_pop(&io_luaState, 1);
+				// Now the only thing on the stack is the asset table at -1,
+				// and the calling function will deal with this
+				// (regardless of whether this function succeeds or fails).
+				return result;
+			}
+
+			{
+				//Get u 
+				constexpr auto* const key2 = "u";
+				lua_pushstring(&io_luaState, key2);
+				lua_gettable(&io_luaState, -2);
+
+
+				// First, then, we will make sure that a value (_any_ value) existed for the key:
+				if (lua_isnil(&io_luaState, -1))
+				{
+
+					result = eae6320::Results::InvalidFile;
+					EAE6320_ASSERT(result);
+					eae6320::Logging::OutputError("No value for %s was found in the asset table", key2);
+					lua_pop(&io_luaState, 3);
+					return result;
+				}
+
+				if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+				{
+					result = eae6320::Results::InvalidFile;
+					EAE6320_ASSERT(result);
+					eae6320::Logging::OutputError("The value for %s must be a number (instead of a %s)", key2, luaL_typename(&io_luaState, -1));
+					// Pop the value
+					lua_pop(&io_luaState, 3);
+					return result;
+				}
+
+				s_vertexData[i - 1].u = static_cast<float>(lua_tonumber(&io_luaState, -1));
+
+				lua_pop(&io_luaState, 1);
+
+				//Get g 
+				constexpr auto* const key3 = "v";
+				lua_pushstring(&io_luaState, key3);
+				lua_gettable(&io_luaState, -2);
+
+
+				// First, then, we will make sure that a value (_any_ value) existed for the key:
+				if (lua_isnil(&io_luaState, -1))
+				{
+
+					result = eae6320::Results::InvalidFile;
+					EAE6320_ASSERT(result);
+					eae6320::Logging::OutputError("No value for %s was found in the asset table", key3);
+					lua_pop(&io_luaState, 3);
+					return result;
+				}
+
+				if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+				{
+					result = eae6320::Results::InvalidFile;
+					EAE6320_ASSERT(result);
+					eae6320::Logging::OutputError("The value for %s must be a number (instead of a %s)", key3, luaL_typename(&io_luaState, -1));
+					// Pop the value
+					lua_pop(&io_luaState, 3);
+					return result;
+				}
+
+				s_vertexData[i - 1].v = static_cast<float>(lua_tonumber(&io_luaState, -1));
+
+				lua_pop(&io_luaState, 1);
+
+			}
+			lua_pop(&io_luaState, 1);
+			}
+
+
 
 			lua_pop(&io_luaState, 1);
 		}
@@ -459,6 +556,8 @@ namespace
 		s_indexData = new uint16_t[s_indexCount];
 		for (unsigned int i = 1; i <= s_indexCount; ++i)
 		{
+
+
 			lua_pushinteger(&io_luaState, i);
 			lua_gettable(&io_luaState, -2);
 
@@ -467,6 +566,9 @@ namespace
 			// Pop the indices table
 			lua_pop(&io_luaState, 1);
 		}
+
+		
+
 
 		return result;
 	}

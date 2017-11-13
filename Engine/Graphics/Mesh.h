@@ -79,7 +79,7 @@ namespace eae6320
 			//====
 			//The index count
 			unsigned int m_indexCount;
-
+			void AdjustIndexData();
 
 #if defined( EAE6320_PLATFORM_D3D )
 			// A vertex buffer holds the data for each vertex
