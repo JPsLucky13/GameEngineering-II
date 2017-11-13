@@ -72,7 +72,14 @@ namespace eae6320
 		// KeyPressState
 		//-------------
 		bool isKeyPressedAlready;
-		bool isAKeyPressed;
+		
+		// KeyPressForMovableMesh
+		//-------------
+		bool isAKeyPressedForMovableMesh;
+
+		// KeyPressForCamera
+		//-------------
+		bool isAKeyPressedForCamera;
 
 		// Elapsed Time
 		//-------------
@@ -94,6 +101,7 @@ namespace eae6320
 
 		// Meshes
 		//--------------
+		std::vector<eae6320::Graphics::Mesh::Handle> meshHandles;
 		std::vector<eae6320::Graphics::Mesh *> meshes;
 
 		// Camera
