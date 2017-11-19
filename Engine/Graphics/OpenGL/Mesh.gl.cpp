@@ -11,7 +11,7 @@
 
 // Initialization / Clean Up
 //--------------------------
-eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount, uint16_t i_indexData[])
+eae6320::cResult eae6320::Graphics::Mesh::Initialize(const uint16_t vertexCount, const eae6320::Graphics::VertexFormats::sMesh * i_vertexData, const uint16_t indexCount, const uint16_t * i_indexData)
 {
 	auto result = eae6320::Results::Success;
 
@@ -76,7 +76,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 	{
 		const auto bufferSize = vertexCount * sizeof(eae6320::Graphics::VertexFormats::sMesh);
 		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
-		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(i_vertexData),
+		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(const_cast<eae6320::Graphics::VertexFormats::sMesh *>(i_vertexData)),
 			// In our class we won't ever read from the buffer
 			GL_STATIC_DRAW);
 		const auto errorCode = glGetError();
@@ -123,7 +123,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 
 		const auto bufferSize = m_indexCount * sizeof(uint16_t);
 		EAE6320_ASSERT(bufferSize < (uint64_t(1u) << (sizeof(GLsizeiptr) * 8)));
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(i_indexData),
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(const_cast<uint16_t *>(i_indexData)),
 			// In our class we won't ever read from the buffer
 			GL_STATIC_DRAW);
 		const auto errorCode = glGetError();
