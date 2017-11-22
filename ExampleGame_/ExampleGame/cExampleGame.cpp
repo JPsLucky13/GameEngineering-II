@@ -185,9 +185,10 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 
 	//Render the mesh with its effect
 	
-	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[0], effects[2], textures[2],meshRigidBody.position);
+	//eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[0], effects[2], textures[2],meshRigidBody.position);
 	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[1], effects[2], textures[3],floorPosition);
-	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[2], effects[2], textures[4], secondStaticMeshPosition);
+	//eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[2], effects[2], textures[4],secondStaticMeshPosition);
+	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[3], effects[2], textures[5], meshRigidBody.position);
 
 	//Submit the camera
 	eae6320::Graphics::SubmitCamera(gameCamera);
@@ -210,7 +211,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 	//Movable mesh initial position
 	meshRigidBody.position.x = 0.0f;
-	meshRigidBody.position.y = 2.0f;
+	meshRigidBody.position.y = 0.5f;
 	meshRigidBody.position.z = 0.0f;
 
 	//Static mesh position
@@ -317,6 +318,15 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	textureHandles.push_back(newTexture);
 	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/Pumpkin.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textureHandles.push_back(newTexture);
+	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
+
 	//Mesh creation
 	eae6320::Graphics::Mesh::Handle newMesh;
 
@@ -339,6 +349,15 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	meshes.push_back(eae6320::Graphics::Mesh::s_manager.Get(newMesh));
 
 	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/SecondStaticMesh.fbx", newMesh);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	meshHandles.push_back(newMesh);
+	meshes.push_back(eae6320::Graphics::Mesh::s_manager.Get(newMesh));
+
+	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/PumpkinMesh.fbx", newMesh);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);

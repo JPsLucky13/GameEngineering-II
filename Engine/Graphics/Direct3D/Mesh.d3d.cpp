@@ -11,7 +11,7 @@
 
 // Initialization / Clean Up
 //--------------------------
-eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount, uint16_t i_indexData[])
+eae6320::cResult eae6320::Graphics::Mesh::Initialize(const uint16_t vertexCount, const eae6320::Graphics::VertexFormats::sMesh * i_vertexData,const uint16_t indexCount, const uint16_t * i_indexData)
 {
 	auto result = eae6320::Results::Success;
 
@@ -126,15 +126,6 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 
 		D3D11_SUBRESOURCE_DATA initialData{};
 		{
-
-			//Vertex data is being assigned
-			for (size_t i = 0; i < vertexCount; i++)
-			{
-				//Alter the v value
-				i_vertexData[i].v = 1.0f - i_vertexData[i].v;
-			}
-
-
 			initialData.pSysMem = i_vertexData;
 			// (The other data members are ignored for non-texture buffers)
 		}
@@ -170,23 +161,7 @@ eae6320::cResult eae6320::Graphics::Mesh::Initialize(unsigned int vertexCount, e
 		}
 		D3D11_SUBRESOURCE_DATA initialData{};
 		{
-			//Index data is being assigned
-			for (size_t i = 0; i < indexCount; i++)
-			{
-				//Swapp the values
-				if (i % 3 == 1)
-				{
-					uint16_t value1 = i_indexData[i];
-					i_indexData[i] = i_indexData[i+1];
-					i_indexData[i + 1] = value1;
-					i += 1;
-				}
-
-			}
-
-
 			initialData.pSysMem = i_indexData;
-			// (The other data members are ignored for non-texture buffers)
 		}
 
 		const auto d3dResult = direct3dDevice->CreateBuffer(&bufferDescription, &initialData, &m_indexBuffer);

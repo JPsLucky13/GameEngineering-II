@@ -106,7 +106,7 @@ namespace eae6320
 			//====
 
 			//centerPosX and centerPosY define the coordinates of the center of the sprite
-			eae6320::cResult Initialize(unsigned int vertexCount, eae6320::Graphics::VertexFormats::sMesh i_vertexData[], unsigned int indexCount, uint16_t i_indexData[]);
+			eae6320::cResult Initialize(const uint16_t vertexCount, const eae6320::Graphics::VertexFormats::sMesh * i_vertexData, const uint16_t indexCount, const uint16_t * i_indexData);
 			eae6320::cResult CleanUp();
 
 			//Constructor
