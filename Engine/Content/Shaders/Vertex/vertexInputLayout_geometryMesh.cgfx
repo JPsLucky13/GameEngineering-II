@@ -39,7 +39,7 @@ void main(
 	// but must match the C calls to glVertexAttribPointer()
 
 	// These values come from one of the VertexFormats::sGeometry that the vertex buffer was filled with in C code
-	layout( location = 0 ) in vec2 i_position;
+	layout( location = 0 ) in vec3 i_position;
 	layout( location = 1 ) in vec4 i_color;
 	layout( location = 2 ) in vec2 i_uv;
 
