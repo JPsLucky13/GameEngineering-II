@@ -3,22 +3,8 @@
   <ItemGroup>
     <ClCompile Include="EntryPoint.cpp" />
     <ClCompile Include="cMeshBuilder.cpp" />
-    <ClCompile Include="Direct3D\MeshBuilder.d3d.cpp">
-      <Filter>Direct3D</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\MeshBuilder.gl.cpp">
-      <Filter>OpenGL</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cMeshBuilder.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Direct3D">
-      <UniqueIdentifier>{97438135-f2e9-4ef3-94f5-c9b19c1d21ed}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="OpenGL">
-      <UniqueIdentifier>{f2776a1e-dbd9-4e9d-9529-2b8e6c5d243c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
 </Project>
