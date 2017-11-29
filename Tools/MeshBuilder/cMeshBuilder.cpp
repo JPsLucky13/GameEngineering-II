@@ -468,7 +468,7 @@ namespace
 
 					lua_pop(&io_luaState, 1);
 
-					//Get g 
+					//Get v
 					constexpr auto* const key3 = "v";
 					lua_pushstring(&io_luaState, key3);
 					lua_gettable(&io_luaState, -2);
@@ -494,9 +494,11 @@ namespace
 						lua_pop(&io_luaState, 3);
 						return result;
 					}
-
+#if defined(EAE6320_PLATFORM_D3D)
+					s_vertexData[i - 1].v = 1.0f - static_cast<float>(lua_tonumber(&io_luaState, -1));
+#elif defined(EAE6320_PLATFORM_GL)
 					s_vertexData[i - 1].v = static_cast<float>(lua_tonumber(&io_luaState, -1));
-
+#endif
 					lua_pop(&io_luaState, 1);
 
 				}
@@ -560,11 +562,15 @@ namespace
 			lua_pushinteger(&io_luaState, i);
 			lua_gettable(&io_luaState, -2);
 
+#if defined(EAE6320_PLATFORM_D3D)
+			s_indexData[s_indexCount - i] = static_cast<uint16_t>(lua_tonumber(&io_luaState, -1));
+#elif defined(EAE6320_PLATFORM_GL)
 			s_indexData[i - 1] = static_cast<uint16_t>(lua_tonumber(&io_luaState, -1));
-
+#endif
 			// Pop the indices table
 			lua_pop(&io_luaState, 1);
 		}
+
 		return result;
 	}
 
@@ -696,8 +702,6 @@ eae6320::cResult eae6320::Assets::cMeshBuilder::Build(const std::vector<std::str
 			OutputErrorMessageWithFileInfo(m_path_source, errorMessage.c_str());
 			return eae6320::Results::Failure;
 		}
-
-		AdjustWindingOrderAndUVs(s_vertexCount, s_vertexData, s_indexCount, s_indexData);
 
 		std::ofstream fout(m_path_target, std::ofstream::binary);
 		
