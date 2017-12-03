@@ -110,6 +110,12 @@ void eae6320::Graphics::Effect::BindRenderState()
 	m_renderState.Bind();
 }
 
+eae6320::Graphics::cRenderState eae6320::Graphics::Effect::GetRenderState()
+{
+	return m_renderState;
+}
+
+
 eae6320::cResult eae6320::Graphics::Effect::CleanUp()
 {
 	auto result = Results::Success;

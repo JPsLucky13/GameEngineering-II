@@ -58,6 +58,10 @@ namespace eae6320
 
 		void ClearColor(float red, float green, float blue, float alpha);
 
+
+		void SortTranslucentMeshes(std::vector<std::tuple<eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *, eae6320::Math::sVector>> & meshTuples);
+
+
 		// This is called (automatically) from the main/render thread.
 		// It will render a submitted frame as soon as it is ready
 		// (i.e. as soon as SignalThatAllDataForAFrameHasBeenSubmitted() has been called)

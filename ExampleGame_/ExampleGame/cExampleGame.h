@@ -12,6 +12,7 @@
 #include <Engine/Results/Results.h>
 #include <Engine/Graphics/Graphics.h>
 #include <Engine/Physics/sRigidBodyState.h>
+#include <Engine/Math/cMatrix_transformation.h>
 
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
@@ -27,6 +28,7 @@ namespace eae6320
 	{
 		// Inherited Implementation
 		//=========================
+
 
 	private:
 
@@ -102,7 +104,9 @@ namespace eae6320
 		// Meshes
 		//--------------
 		std::vector<eae6320::Graphics::Mesh::Handle> meshHandles;
-		std::vector<eae6320::Graphics::Mesh *> meshes;
+		std::vector<std::tuple<eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *,Math::sVector>> meshes;
+		std::vector<eae6320::Graphics::Mesh::Handle> translucentMeshHandles;
+		std::vector<std::tuple<eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *, Math::sVector>> translucentMeshes;
 
 		// Camera
 		//--------------
@@ -133,7 +137,6 @@ namespace eae6320
 		// Submit render data
 
 		virtual void SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate) override;
-
 
 		// Initialization / Clean Up
 		//--------------------------

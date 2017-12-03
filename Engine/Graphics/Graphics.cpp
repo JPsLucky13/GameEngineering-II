@@ -20,6 +20,7 @@
 #include <Engine/Time/Time.h>
 #include <Engine/UserOutput/UserOutput.h>
 #include <utility>
+#include <algorithm>
 
 // Helper Function Declarations
 //=============================
@@ -71,10 +72,7 @@ namespace
 		eae6320::Graphics::ConstantBufferFormats::sPerDrawCall constantData_perDrawCall;
 
 		//Meshes
-		std::vector<std::tuple <eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *>> meshTuples;
-
-		//MeshPositions
-		std::vector<eae6320::Math::sVector> meshPositions;
+		std::vector<std::tuple <eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *, eae6320::Math::sVector>> meshTuples;
 
 	};
 
@@ -142,8 +140,6 @@ void eae6320::Graphics::ClearColor(float red, float green, float blue, float alp
 
 void eae6320::Graphics::RenderSpriteWithEffectAndTexture(Sprite * sprite, Effect * effect, cTexture * texture)
 {
-
-	
 		sprite->IncrementReferenceCount();
 		effect->IncrementReferenceCount();
 		texture->IncrementReferenceCount();
@@ -159,14 +155,27 @@ void eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(Mesh * mesh, Ef
 	effect->IncrementReferenceCount();
 	texture->IncrementReferenceCount();
 
-	s_dataBeingSubmittedByApplicationThread->meshTuples.push_back(std::make_tuple(mesh,effect,texture));
-	s_dataBeingSubmittedByApplicationThread->meshPositions.push_back(position);
+	s_dataBeingSubmittedByApplicationThread->meshTuples.push_back(std::make_tuple(mesh,effect,texture,position));
 }
 
 void eae6320::Graphics::SubmitCamera(Camera * camera)
 {
 	s_dataBeingSubmittedByApplicationThread->constantData_perFrame.g_transform_worldToCamera = eae6320::Math::cMatrix_transformation::CreateWorldToCameraTransform(camera->m_cameraRigidBody.orientation, camera->m_cameraRigidBody.position);
 	s_dataBeingSubmittedByApplicationThread->constantData_perFrame.g_transform_cameraToProjected = eae6320::Math::cMatrix_transformation::CreateCameraToProjectedTransform_perspective(Math::ConvertDegreesToRadians(camera->m_verticalFieldOfView_inRadians),camera->m_aspectRatio, camera->m_z_nearPlane,camera->m_z_farPlane);
+}
+
+bool MeshSortCondition(const  std::tuple<eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *, eae6320::Math::sVector>& left, const std::tuple<eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *, eae6320::Math::sVector>& right)
+{
+	eae6320::Math::sVector leftCameraPosition = s_dataBeingSubmittedByApplicationThread->constantData_perFrame.g_transform_worldToCamera * std::get<3>(left);
+	eae6320::Math::sVector rightCameraPosition = s_dataBeingSubmittedByApplicationThread->constantData_perFrame.g_transform_worldToCamera * std::get<3>(right);
+
+	return leftCameraPosition.z < rightCameraPosition.z;
+}
+
+void eae6320::Graphics::SortTranslucentMeshes(std::vector<std::tuple<eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *, eae6320::Math::sVector>> & meshTuples)
+{
+	//Translucent
+	std::sort(meshTuples.begin(), meshTuples.end(), MeshSortCondition);
 }
 
 
@@ -232,7 +241,7 @@ void eae6320::Graphics::RenderFrame()
 			std::get<1>(s_dataBeingRenderedByRenderThread->meshTuples[i])->Bind();
 			std::get<2>(s_dataBeingRenderedByRenderThread->meshTuples[i])->Bind(0);
 			auto& constantData_perDrawCall = s_dataBeingSubmittedByApplicationThread->constantData_perDrawCall;
-			constantData_perDrawCall.g_transform_localToWorld = Math::cMatrix_transformation(Math::cQuaternion(), s_dataBeingRenderedByRenderThread->meshPositions[i]);
+			constantData_perDrawCall.g_transform_localToWorld = Math::cMatrix_transformation(Math::cQuaternion(), std::get<3>(s_dataBeingRenderedByRenderThread->meshTuples[i]));
 			s_constantBuffer_perDrawCall.Update(&constantData_perDrawCall);
 			std::get<0>(s_dataBeingRenderedByRenderThread->meshTuples[i])->Draw();
 		}
@@ -273,7 +282,6 @@ void eae6320::Graphics::RenderFrame()
 	s_dataBeingRenderedByRenderThread->sprites.clear();
 	s_dataBeingRenderedByRenderThread->textures.clear();
 	s_dataBeingRenderedByRenderThread->meshTuples.clear();
-	s_dataBeingRenderedByRenderThread->meshPositions.clear();
 }
 
 
@@ -415,7 +423,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	s_dataBeingRenderedByRenderThread->sprites.clear();
 	s_dataBeingRenderedByRenderThread->textures.clear();
 	s_dataBeingRenderedByRenderThread->meshTuples.clear();
-	s_dataBeingRenderedByRenderThread->meshPositions.clear();
 
 	//Reset the arbitrary number of sprites and effects
 	for (size_t i = 0; i < s_dataBeingSubmittedByApplicationThread->effects.size(); i++)
@@ -441,7 +448,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 	s_dataBeingSubmittedByApplicationThread->sprites.clear();
 	s_dataBeingSubmittedByApplicationThread->textures.clear();
 	s_dataBeingSubmittedByApplicationThread->meshTuples.clear();
-	s_dataBeingSubmittedByApplicationThread->meshPositions.clear();
 
 	{
 		const auto localResult = s_constantBuffer_perFrame.CleanUp();

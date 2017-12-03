@@ -25,6 +25,7 @@ return
 		{ path = "Shaders/Fragment/sprite1.cgfx", arguments = { "fragment" } },
 		{ path = "Shaders/Fragment/sprite2.cgfx", arguments = { "fragment" } },
 		{ path = "Shaders/Fragment/mesh.cgfx", arguments = { "fragment" } },
+		{ path = "Shaders/Fragment/meshTrans.cgfx", arguments = { "fragment" } },
 	},
 	textures =
 	{
