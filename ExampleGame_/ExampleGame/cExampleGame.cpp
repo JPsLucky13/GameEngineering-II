@@ -222,7 +222,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 	//Movable mesh initial position
 	meshRigidBody.position.x = 0.0f;
-	meshRigidBody.position.y = 0.5f;
+	meshRigidBody.position.y = 0.0f;
 	meshRigidBody.position.z = 2.0f;
 
 	//Static mesh position
