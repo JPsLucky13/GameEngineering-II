@@ -221,7 +221,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	gameCamera = new eae6320::Graphics::Camera(cameraRigidBody,45.0f,1.0f,0.1f,100.0f);
 
 	//Movable mesh initial position
-	meshRigidBody.position.x = 0.0f;
+	meshRigidBody.position.x = -1.0f;
 	meshRigidBody.position.y = 0.0f;
 	meshRigidBody.position.z = 2.0f;
 
@@ -232,7 +232,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 	//Second static mesh position
 	secondStaticMeshPosition.x = 0.0f;
-	secondStaticMeshPosition.y = 0.5f;
+	secondStaticMeshPosition.y = 0.0f;
 	secondStaticMeshPosition.z = 0.1f;
 
 	//Effect and sprite pointers
@@ -376,7 +376,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 		return Results::Failure;
 	}
 	translucentMeshHandles.push_back(newMesh);
-	translucentMeshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[3], textures[3],secondStaticMeshPosition));
+	translucentMeshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[3], textures[4],secondStaticMeshPosition));
 
 
 	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/PumpkinMesh.fbx", newMesh);
