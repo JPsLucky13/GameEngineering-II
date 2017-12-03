@@ -71,6 +71,10 @@ namespace eae6320
 			//Check Program Id
 			eae6320::cResult CheckProgramID(eae6320::cResult & result);
 
+			//Get the effect's render state
+			eae6320::Graphics::cRenderState GetRenderState();
+
+
 		private:
 
 			// Data

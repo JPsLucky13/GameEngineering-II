@@ -6,6 +6,7 @@
 #include <Engine/Asserts/Asserts.h>
 #include <Engine/UserInput/UserInput.h>
 
+
 // Inherited Implementation
 //=========================
 
@@ -170,6 +171,7 @@ void eae6320::cExampleGame::UpdateSimulationBasedOnTime(const float i_elapsedSec
 }
 
 
+
 void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate)
 {
 
@@ -182,20 +184,29 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 	meshRigidBody.PredictFuturePosition(i_elapsedSecondCount_sinceLastSimulationUpdate);
 	gameCamera->m_cameraRigidBody.PredictFuturePosition(i_elapsedSecondCount_sinceLastSimulationUpdate);
 
+	//Submit the camera
+	eae6320::Graphics::SubmitCamera(gameCamera);
 
 	//Render the mesh with its effect
 	
 	//eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[0], effects[2], textures[2],meshRigidBody.position);
-	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[1], effects[2], textures[3],floorPosition);
 	//eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[2], effects[2], textures[4],secondStaticMeshPosition);
-	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[3], effects[2], textures[5], meshRigidBody.position);
+	
+	//Opaque
+	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(meshes[1]), std::get<1>(meshes[1]), std::get<2>(meshes[1]), std::get<3>(meshes[1]));
 
-	//Submit the camera
-	eae6320::Graphics::SubmitCamera(gameCamera);
+	eae6320::Graphics::SortTranslucentMeshes(translucentMeshes);
+	
+	//Translucent
+	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(translucentMeshes[0]), std::get<1>(translucentMeshes[0]), std::get<2>(translucentMeshes[0]), std::get<3>(translucentMeshes[0]));
+	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(translucentMeshes[1]), std::get<1>(translucentMeshes[1]), std::get<2>(translucentMeshes[1]), std::get<3>(translucentMeshes[1]));
 
 	//User specify's the background clear color
 	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
 }
+
+
+
 
 // Initialization / Clean Up
 //--------------------------
@@ -212,7 +223,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	//Movable mesh initial position
 	meshRigidBody.position.x = 0.0f;
 	meshRigidBody.position.y = 0.5f;
-	meshRigidBody.position.z = 0.0f;
+	meshRigidBody.position.z = 2.0f;
 
 	//Static mesh position
 	floorPosition.x = 0.0f;
@@ -220,9 +231,9 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	floorPosition.z = 0.0f;
 
 	//Second static mesh position
-	secondStaticMeshPosition.x = -1.0f;
-	secondStaticMeshPosition.y = 0.0f;
-	secondStaticMeshPosition.z = 0.0f;
+	secondStaticMeshPosition.x = 0.0f;
+	secondStaticMeshPosition.y = 0.5f;
+	secondStaticMeshPosition.z = 0.1f;
 
 	//Effect and sprite pointers
 	eae6320::Graphics::Effect * newEffect;
@@ -251,6 +262,16 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	effects.push_back(newEffect);
 
 	result = eae6320::Graphics::Effect::Factory(newEffect, "mesh", "mesh", eae6320::Graphics::RenderStates::DepthBuffering);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+
+	effects.push_back(newEffect);
+
+	//The translucent effect
+	result = eae6320::Graphics::Effect::Factory(newEffect, "mesh", "meshTrans", eae6320::Graphics::RenderStates::AlphaTransparency | eae6320::Graphics::RenderStates::DepthBuffering);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
@@ -337,7 +358,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 		return Results::Failure;
 	}
 	meshHandles.push_back(newMesh);
-	meshes.push_back(eae6320::Graphics::Mesh::s_manager.Get(newMesh));
+	meshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[2], textures[4],meshRigidBody.position));
 
 	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/StaticMesh.fbx", newMesh);
 	if (!result)
@@ -346,7 +367,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 		return Results::Failure;
 	}
 	meshHandles.push_back(newMesh);
-	meshes.push_back(eae6320::Graphics::Mesh::s_manager.Get(newMesh));
+	meshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[2], textures[3],floorPosition));
 
 	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/SecondStaticMesh.fbx", newMesh);
 	if (!result)
@@ -354,8 +375,9 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 		EAE6320_ASSERT(result);
 		return Results::Failure;
 	}
-	meshHandles.push_back(newMesh);
-	meshes.push_back(eae6320::Graphics::Mesh::s_manager.Get(newMesh));
+	translucentMeshHandles.push_back(newMesh);
+	translucentMeshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[3], textures[3],secondStaticMeshPosition));
+
 
 	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/PumpkinMesh.fbx", newMesh);
 	if (!result)
@@ -363,8 +385,8 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 		EAE6320_ASSERT(result);
 		return Results::Failure;
 	}
-	meshHandles.push_back(newMesh);
-	meshes.push_back(eae6320::Graphics::Mesh::s_manager.Get(newMesh));
+	translucentMeshHandles.push_back(newMesh);
+	translucentMeshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh),effects[3], textures[5],meshRigidBody.position));
 
 	return Results::Success;
 }
@@ -393,6 +415,13 @@ eae6320::cResult eae6320::cExampleGame::CleanUp()
 	{
 		eae6320::Graphics::Mesh::s_manager.Release(meshHandles[i]);
 	}
+
+	//Destroy the meshes
+	for (size_t i = 0; i < translucentMeshes.size(); i++)
+	{
+		eae6320::Graphics::Mesh::s_manager.Release(translucentMeshHandles[i]);
+	}
+
 
 	//Delete the camera
 	delete gameCamera;
