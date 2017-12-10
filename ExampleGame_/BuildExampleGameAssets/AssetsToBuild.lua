@@ -6,10 +6,8 @@ return
 {
 	meshes =
 	{
-		"Meshes/MovableMesh.lua",
-		"Meshes/StaticMesh.lua",
-		"Meshes/SecondStaticMesh.lua",
-		"Meshes/PumpkinMesh.lua",
+		"Meshes/SpacePaddle.lua",
+		"Meshes/Ball.lua",
 	},
 	shaders =
 	{
@@ -33,12 +31,7 @@ return
 		-- These are some examples with my disk layout.
 		-- You need to update the paths to match your content
 		-- and then add the other textures that you use.
-		"Textures/texture1.png",
-		"Textures/texture2.png",
-		"Textures/texture3.png",
-		"Textures/texture4.png",
-		"Textures/texture5.png",
-		"Textures/texture6.png",
-		"Textures/Pumpkin.png",
+		"Textures/SpacePaddle.png",
+		"Textures/Ball.png",
 	},
 }

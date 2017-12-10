@@ -44,129 +44,129 @@ void eae6320::cExampleGame::UpdateBasedOnInput()
 void eae6320::cExampleGame::UpdateBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate)
 {
 
-	counter += i_elapsedSecondCount_sinceLastUpdate;
+	//counter += i_elapsedSecondCount_sinceLastUpdate;
 
-	if (counter > timeToSwitchTexture)
+	/*if (counter > timeToSwitchTexture)
 	{
 		std::swap(textures[0], textures[1]);
 		counter = 0.0f;
 
-	}
+	}*/
 
 }
 
 void eae6320::cExampleGame::UpdateSimulationBasedOnInput()
 {
 
-	isAKeyPressedForMovableMesh = false;
-	isAKeyPressedForCamera = false;
+	isAKeyPressedForBreakOutPaddleMesh = false;
 
-	//Camera Movement
-	if (UserInput::IsKeyPressed('D'))
+	//Check if the Paddle is within the screen space
+	if (breakOutPaddleMeshRigidBody.position.x > spacePaddleMaxScreenWidth)
 	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.velocity.x = 1.0f;
+		breakOutPaddleMeshRigidBody.position.x = spacePaddleMaxScreenWidth;
 	}
-	if (UserInput::IsKeyPressed('A'))
+	if (breakOutPaddleMeshRigidBody.position.x < -spacePaddleMaxScreenWidth)
 	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.velocity.x = -1.0f;
-	}
-	if (UserInput::IsKeyPressed('E'))
-	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.velocity.z = -1.0f;
-	}
-	if (UserInput::IsKeyPressed('Q'))
-	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.velocity.z = 1.0f;
-	}
-	if (UserInput::IsKeyPressed('W'))
-	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.velocity.y = 1.0f;
-	}
-	if (UserInput::IsKeyPressed('S'))
-	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.velocity.y = -1.0f;
-	}
-
-	//Camera Rotation
-	if (UserInput::IsKeyPressed('T'))
-	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.angularSpeed = 0.1f;
-		gameCamera->m_cameraRigidBody.angularVelocity_axis_local = Math::sVector(0.0f, 1.0f, 0.0f);
-	}
-	if (UserInput::IsKeyPressed('G'))
-	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.angularSpeed = -0.1f;
-		gameCamera->m_cameraRigidBody.angularVelocity_axis_local = Math::sVector(0.0f, 1.0f, 0.0f);
-	}
-	if (UserInput::IsKeyPressed('Y'))
-	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.angularSpeed = 0.1f;
-		gameCamera->m_cameraRigidBody.angularVelocity_axis_local = Math::sVector(1.0f, 0.0f, 0.0f);
-	}
-	if (UserInput::IsKeyPressed('H'))
-	{
-		isAKeyPressedForCamera = true;
-		gameCamera->m_cameraRigidBody.angularSpeed = -0.1f;
-		gameCamera->m_cameraRigidBody.angularVelocity_axis_local = Math::sVector(1.0f, 0.0f, 0.0f);
+		breakOutPaddleMeshRigidBody.position.x = -spacePaddleMaxScreenWidth;
 	}
 
 
-	//Mesh Movement
+	//Paddle Movement right
 	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Right))
 	{
-		isAKeyPressedForMovableMesh = true;
-		meshRigidBody.velocity.x = 1.0f;
+		isAKeyPressedForBreakOutPaddleMesh = true;
+		breakOutPaddleMeshRigidBody.velocity.x = spacePaddleSpeed;
 	}
 
-
+	//Paddle Movement left
 	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Left))
 	{
-		isAKeyPressedForMovableMesh = true;
-		meshRigidBody.velocity.x = -1.0f;
+		isAKeyPressedForBreakOutPaddleMesh = true;
+		breakOutPaddleMeshRigidBody.velocity.x = -spacePaddleSpeed;
 	}
 
-	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Up))
+
+	//Check if the Ball hit the Space Paddle
+	if (eae6320::Math::Distance(breakOutBallMeshRigidBody.position,breakOutPaddleMeshRigidBody.position) <= 0.7f)
 	{
-		isAKeyPressedForMovableMesh = true;
-		meshRigidBody.velocity.y = 1.0f;
+		//The ball is on top
+		if (breakOutPaddleMeshRigidBody.position.y < breakOutBallMeshRigidBody.position.y)
+		{
+			ballSpeedX = -ballSpeedX;
+			ballSpeedY = -ballSpeedY;
+		}
+		//The ball is on the right
+		if (breakOutPaddleMeshRigidBody.position.x < breakOutBallMeshRigidBody.position.x)
+		{
+			ballSpeedX = -ballSpeedX;
+		}
+		//The ball is on the left
+		if (breakOutPaddleMeshRigidBody.position.x > breakOutBallMeshRigidBody.position.x)
+		{
+			ballSpeedX = -ballSpeedX;
+		}
 	}
 
-	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Down))
+
+	//Reset the ball position if it goes below the screen
+	if (breakOutBallMeshRigidBody.position.y < -ballMaxScreenWidth)
 	{
-		isAKeyPressedForMovableMesh = true;
-		meshRigidBody.velocity.y = -1.0f;
+		ballReleased = false;
+		breakOutBallMeshRigidBody.velocity.x = 0.0f;
+		breakOutBallMeshRigidBody.velocity.y = 0.0f;
+		ballSpeedX = 3.0f;
+		ballSpeedY = 3.0f;
+		breakOutBallMeshRigidBody.position.y = breakOutPaddleMeshRigidBody.position.y + 0.5f;
+	}
+	
+	//Check if the Ball is within the screen space and flip velocity
+	if (breakOutBallMeshRigidBody.position.x > ballMaxScreenWidth || breakOutBallMeshRigidBody.position.x < -ballMaxScreenWidth)
+	{
+		ballSpeedX = -ballSpeedX;
+	}
+	if (breakOutBallMeshRigidBody.position.y > ballMaxScreenWidth)
+	{
+		ballSpeedY = -ballSpeedY;
+	}
+	
+
+	//Ball Release
+	if (!ballReleased)
+	{
+		breakOutBallMeshRigidBody.position.x = breakOutPaddleMeshRigidBody.position.x;
+	}
+	else
+	{
+		breakOutBallMeshRigidBody.velocity.x = ballSpeedX;
+		breakOutBallMeshRigidBody.velocity.y = ballSpeedY;
 	}
 
-	if(!isAKeyPressedForMovableMesh)
+
+
+
+
+	if(!isAKeyPressedForBreakOutPaddleMesh)
 	{
 		//Stop mesh movement
-		meshRigidBody.velocity.x = 0.0f;
-		meshRigidBody.velocity.y = 0.0f;
-	}
-
-	if (!isAKeyPressedForCamera)
-	{
-		//Stop Camera movement and rotation
-		gameCamera->m_cameraRigidBody.velocity.x = 0.0f;
-		gameCamera->m_cameraRigidBody.velocity.y = 0.0f;
-		gameCamera->m_cameraRigidBody.velocity.z = 0.0f;
-		gameCamera->m_cameraRigidBody.angularSpeed = 0.0f;
+		breakOutPaddleMeshRigidBody.velocity.x = 0.0f;
+		breakOutPaddleMeshRigidBody.velocity.y = 0.0f;
 	}
 		
+	//Press Space Bar to Release the Ball
+	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Space))
+	{
+		ballReleased = true;
+	}
+
+
+
+
 }
 
 void eae6320::cExampleGame::UpdateSimulationBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate)
 {
-	meshRigidBody.Update(i_elapsedSecondCount_sinceLastUpdate);
+	breakOutPaddleMeshRigidBody.Update(i_elapsedSecondCount_sinceLastUpdate);
+	breakOutBallMeshRigidBody.Update(i_elapsedSecondCount_sinceLastUpdate);
 	gameCamera->m_cameraRigidBody.Update(i_elapsedSecondCount_sinceLastUpdate);
 }
 
@@ -176,12 +176,13 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 {
 
 	//Render the sprite pairs
-	for (size_t i = 0; i < sprites.size(); i++)
+	/*for (size_t i = 0; i < sprites.size(); i++)
 	{
 		eae6320::Graphics::RenderSpriteWithEffectAndTexture(sprites[i],effects[i], textures[i]);
-	}
+	}*/
 
-	meshRigidBody.PredictFuturePosition(i_elapsedSecondCount_sinceLastSimulationUpdate);
+	breakOutPaddleMeshRigidBody.PredictFuturePosition(i_elapsedSecondCount_sinceLastSimulationUpdate);
+	breakOutBallMeshRigidBody.PredictFuturePosition(i_elapsedSecondCount_sinceLastSimulationUpdate);
 	gameCamera->m_cameraRigidBody.PredictFuturePosition(i_elapsedSecondCount_sinceLastSimulationUpdate);
 
 	//Submit the camera
@@ -192,14 +193,11 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 	//eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[0], effects[2], textures[2],meshRigidBody.position);
 	//eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(meshes[2], effects[2], textures[4],secondStaticMeshPosition);
 	
-	//Opaque
-	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(meshes[1]), std::get<1>(meshes[1]), std::get<2>(meshes[1]), std::get<3>(meshes[1]));
+	//Render the Paddle
+	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(meshes[0]), std::get<1>(meshes[0]), std::get<2>(meshes[0]), breakOutPaddleMeshRigidBody.position);
 
-	eae6320::Graphics::SortTranslucentMeshes(translucentMeshes);
-	
-	//Translucent
-	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(translucentMeshes[0]), std::get<1>(translucentMeshes[0]), std::get<2>(translucentMeshes[0]), std::get<3>(translucentMeshes[0]));
-	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(translucentMeshes[1]), std::get<1>(translucentMeshes[1]), std::get<2>(translucentMeshes[1]), std::get<3>(translucentMeshes[1]));
+	//Render the Ball
+	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(meshes[1]), std::get<1>(meshes[1]), std::get<2>(meshes[1]), breakOutBallMeshRigidBody.position);
 
 	//User specify's the background clear color
 	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
@@ -217,23 +215,18 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	cameraRigidBody.position.x = 0.0f;
 	cameraRigidBody.position.y = 0.0f;
 	cameraRigidBody.position.z = 10.0f;
-
 	gameCamera = new eae6320::Graphics::Camera(cameraRigidBody,45.0f,1.0f,0.1f,100.0f);
 
-	//Movable mesh initial position
-	meshRigidBody.position.x = -1.0f;
-	meshRigidBody.position.y = 0.0f;
-	meshRigidBody.position.z = 2.0f;
+	//The BreakOut paddle
+	breakOutPaddleMeshRigidBody.position.x = 0.0f;
+	breakOutPaddleMeshRigidBody.position.y = -3.8f;
+	breakOutPaddleMeshRigidBody.position.z = 0.0f;
 
-	//Static mesh position
-	floorPosition.x = 0.0f;
-	floorPosition.y = -1.0f;
-	floorPosition.z = 0.0f;
+	//The BreakOut ball
+	breakOutBallMeshRigidBody.position.x = breakOutPaddleMeshRigidBody.position.x;
+	breakOutBallMeshRigidBody.position.y = breakOutPaddleMeshRigidBody.position.y + 0.5f;
+	breakOutBallMeshRigidBody.position.z = breakOutPaddleMeshRigidBody.position.z;
 
-	//Second static mesh position
-	secondStaticMeshPosition.x = 0.0f;
-	secondStaticMeshPosition.y = 0.0f;
-	secondStaticMeshPosition.z = 0.1f;
 
 	//Effect and sprite pointers
 	eae6320::Graphics::Effect * newEffect;
@@ -241,7 +234,6 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 
 	//Call to factory function for effects
-	
 	auto result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
 	if (!result)
 	{
@@ -251,33 +243,13 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	
 	effects.push_back(newEffect);
 
-
-	result = eae6320::Graphics::Effect::Factory(newEffect, "sprite", "sprite2", eae6320::Graphics::RenderStates::AlphaTransparency);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-
-	effects.push_back(newEffect);
-
+	//Call to effect for rendering meshes
 	result = eae6320::Graphics::Effect::Factory(newEffect, "mesh", "mesh", eae6320::Graphics::RenderStates::DepthBuffering);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
 		return Results::Failure;
 	}
-
-	effects.push_back(newEffect);
-
-	//The translucent effect
-	result = eae6320::Graphics::Effect::Factory(newEffect, "mesh", "meshTrans", eae6320::Graphics::RenderStates::AlphaTransparency | eae6320::Graphics::RenderStates::DepthBuffering);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-
 	effects.push_back(newEffect);
 
 
@@ -292,9 +264,11 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	sprites.push_back(newSprite);
 
 	//Texture creation
+
+	//Paddle
 	eae6320::Graphics::cTexture::Handle newTexture;
 
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture4.png", newTexture);
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/SpacePaddle.png", newTexture);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
@@ -303,7 +277,9 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	textureHandles.push_back(newTexture);
 	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture5.png", newTexture);
+	//Ball
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/Ball.png", newTexture);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
@@ -312,81 +288,29 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	textureHandles.push_back(newTexture);
 	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture6.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
-
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture3.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
-
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/texture1.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
-
-	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/Pumpkin.png", newTexture);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	textureHandles.push_back(newTexture);
-	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
 	//Mesh creation
+
+	//Paddle
 	eae6320::Graphics::Mesh::Handle newMesh;
 
-	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/MovableMesh.fbx", newMesh);
+	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/SpacePaddle.fbx", newMesh);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
 		return Results::Failure;
 	}
 	meshHandles.push_back(newMesh);
-	meshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[2], textures[4],meshRigidBody.position));
+	meshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[1], textures[0], breakOutPaddleMeshRigidBody.position));
 
-	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/StaticMesh.fbx", newMesh);
+	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/Ball.fbx", newMesh);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
 		return Results::Failure;
 	}
 	meshHandles.push_back(newMesh);
-	meshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[2], textures[3],floorPosition));
-
-	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/SecondStaticMesh.fbx", newMesh);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	translucentMeshHandles.push_back(newMesh);
-	translucentMeshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[3], textures[4],secondStaticMeshPosition));
-
-
-	result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/PumpkinMesh.fbx", newMesh);
-	if (!result)
-	{
-		EAE6320_ASSERT(result);
-		return Results::Failure;
-	}
-	translucentMeshHandles.push_back(newMesh);
-	translucentMeshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh),effects[3], textures[5],meshRigidBody.position));
+	meshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[1], textures[1], breakOutBallMeshRigidBody.position));
 
 	return Results::Success;
 }
@@ -415,13 +339,6 @@ eae6320::cResult eae6320::cExampleGame::CleanUp()
 	{
 		eae6320::Graphics::Mesh::s_manager.Release(meshHandles[i]);
 	}
-
-	//Destroy the meshes
-	for (size_t i = 0; i < translucentMeshes.size(); i++)
-	{
-		eae6320::Graphics::Mesh::s_manager.Release(translucentMeshHandles[i]);
-	}
-
 
 	//Delete the camera
 	delete gameCamera;
