@@ -6,6 +6,82 @@
 #include <Engine/Asserts/Asserts.h>
 #include <Engine/UserInput/UserInput.h>
 
+// Brick Positions
+//-------------
+std::vector<eae6320::Math::sVector> brickPositions;
+
+void FillBrickPositions()
+{
+	//Create the brick for each position
+	eae6320::Math::sVector tempBrickPosition;
+
+	//First row from the top
+	tempBrickPosition.x = -3.0f;
+	tempBrickPosition.y = 3.5f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = -1.5f;
+	tempBrickPosition.y = 3.5f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = 0.0f;
+	tempBrickPosition.y = 3.5f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = 1.5f;
+	tempBrickPosition.y = 3.5f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = 3.0f;
+	tempBrickPosition.y = 3.5f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+
+	//Second row
+	tempBrickPosition.x = -3.0f;
+	tempBrickPosition.y = 2.75f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = -1.5f;
+	tempBrickPosition.y = 2.75f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = 0.0f;
+	tempBrickPosition.y = 2.75f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = 1.5f;
+	tempBrickPosition.y = 2.75f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = 3.0f;
+	tempBrickPosition.y = 2.75f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+
+	//Third row
+	tempBrickPosition.x = -3.0f;
+	tempBrickPosition.y = 2.0f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = -1.5f;
+	tempBrickPosition.y = 2.0f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = 0.0f;
+	tempBrickPosition.y = 2.0f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = 1.5f;
+	tempBrickPosition.y = 2.0f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+	tempBrickPosition.x = 3.0f;
+	tempBrickPosition.y = 2.0f;
+	tempBrickPosition.z = 0.0f;
+	brickPositions.push_back(tempBrickPosition);
+}
+
 
 // Inherited Implementation
 //=========================
@@ -43,15 +119,37 @@ void eae6320::cExampleGame::UpdateBasedOnInput()
 
 void eae6320::cExampleGame::UpdateBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate)
 {
-
-	//counter += i_elapsedSecondCount_sinceLastUpdate;
-
-	/*if (counter > timeToSwitchTexture)
+	//Flash feedback
+	if(feedbackCounter <= maxFeedbackCounterValue)
+	{ 
+		feedbackCounter += i_elapsedSecondCount_sinceLastUpdate;
+	}
+	else
 	{
-		std::swap(textures[0], textures[1]);
-		counter = 0.0f;
+		feedbackCounter = maxFeedbackCounterValue;
+	}
 
-	}*/
+	if (feedbackCounter >= timeToBlack)
+	{
+		ScreenFeedbackR = 0.0f;
+		ScreenFeedbackG = 0.0f;
+		ScreenFeedbackB = 0.0f;
+	}
+
+	//End state feedback message
+	if (endStateCounter <= maxEndStateCounterValue)
+	{
+		endStateCounter += i_elapsedSecondCount_sinceLastUpdate;
+	}
+	else
+	{
+		endStateCounter = maxEndStateCounterValue;
+	}
+
+	if (endStateCounter >= timeToErase)
+	{
+		endStateMessage = 5;
+	}
 
 }
 
@@ -85,6 +183,73 @@ void eae6320::cExampleGame::UpdateSimulationBasedOnInput()
 		breakOutPaddleMeshRigidBody.velocity.x = -spacePaddleSpeed;
 	}
 
+	//Check if the Ball hit a Space Brick
+	for (size_t i = 0; i < brickPositions.size(); i++)
+	{
+		if (eae6320::Math::Distance(breakOutBallMeshRigidBody.position, brickPositions[i]) <= 0.7f)
+		{
+			//The ball is on top
+			if (breakOutBallMeshRigidBody.position.y > brickPositions[i].y)
+			{
+				ballSpeedX = -ballSpeedX;
+				ballSpeedY = -ballSpeedY;
+				brickPositions.erase(brickPositions.begin() + i);
+				ScreenFeedbackR = 0.0f;
+				ScreenFeedbackG = 0.5f;
+				ScreenFeedbackB = 0.0f;
+				feedbackCounter = 0.0f;
+				break;
+			}
+			//The ball is on the right
+			if (breakOutBallMeshRigidBody.position.x > brickPositions[i].x)
+			{
+				ballSpeedX = -ballSpeedX;
+				brickPositions.erase(brickPositions.begin() + i);
+				ScreenFeedbackR = 0.0f;
+				ScreenFeedbackG = 0.5f;
+				ScreenFeedbackB = 0.0f;
+				feedbackCounter = 0.0f;
+				break;
+			}
+			//The ball is on the left
+			if (breakOutBallMeshRigidBody.position.x < brickPositions[i].x)
+			{
+				ballSpeedX = -ballSpeedX;
+				brickPositions.erase(brickPositions.begin() + i);
+				ScreenFeedbackR = 0.0f;
+				ScreenFeedbackG = 0.5f;
+				ScreenFeedbackB = 0.0f;
+				feedbackCounter = 0.0f;
+				break;
+			}
+			//The ball is below
+			if (breakOutBallMeshRigidBody.position.y < brickPositions[i].y)
+			{
+				ballSpeedX = -ballSpeedX;
+				ballSpeedY = -ballSpeedY;
+				brickPositions.erase(brickPositions.begin() + i);
+				ScreenFeedbackR = 0.0f;
+				ScreenFeedbackG = 0.5f;
+				ScreenFeedbackB = 0.0f;
+				feedbackCounter = 0.0f;
+				break;
+			}
+		}
+	}
+
+	//Check if All the bricks were destroyed
+	if (brickPositions.size() == 0)
+	{
+		ballReleased = false;
+		breakOutBallMeshRigidBody.velocity.x = 0.0f;
+		breakOutBallMeshRigidBody.velocity.y = 0.0f;
+		ballSpeedX = 3.0f;
+		ballSpeedY = 3.0f;
+		breakOutBallMeshRigidBody.position.y = breakOutPaddleMeshRigidBody.position.y + 0.5f;
+		FillBrickPositions();
+		endStateMessage = 3;
+		endStateCounter = 0.0f;
+	}
 
 	//Check if the Ball hit the Space Paddle
 	if (eae6320::Math::Distance(breakOutBallMeshRigidBody.position,breakOutPaddleMeshRigidBody.position) <= 0.7f)
@@ -112,10 +277,16 @@ void eae6320::cExampleGame::UpdateSimulationBasedOnInput()
 	if (breakOutBallMeshRigidBody.position.y < -ballMaxScreenWidth)
 	{
 		ballReleased = false;
+		ScreenFeedbackR = 0.5f;
+		ScreenFeedbackG = 0.0f;
+		ScreenFeedbackB = 0.0f;
+		feedbackCounter = 0.0f;
 		breakOutBallMeshRigidBody.velocity.x = 0.0f;
 		breakOutBallMeshRigidBody.velocity.y = 0.0f;
 		ballSpeedX = 3.0f;
 		ballSpeedY = 3.0f;
+		endStateMessage = 4;
+		endStateCounter = 0.0f;
 		breakOutBallMeshRigidBody.position.y = breakOutPaddleMeshRigidBody.position.y + 0.5f;
 	}
 	
@@ -175,11 +346,7 @@ void eae6320::cExampleGame::UpdateSimulationBasedOnTime(const float i_elapsedSec
 void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate)
 {
 
-	//Render the sprite pairs
-	/*for (size_t i = 0; i < sprites.size(); i++)
-	{
-		eae6320::Graphics::RenderSpriteWithEffectAndTexture(sprites[i],effects[i], textures[i]);
-	}*/
+	
 
 	breakOutPaddleMeshRigidBody.PredictFuturePosition(i_elapsedSecondCount_sinceLastSimulationUpdate);
 	breakOutBallMeshRigidBody.PredictFuturePosition(i_elapsedSecondCount_sinceLastSimulationUpdate);
@@ -199,8 +366,17 @@ void eae6320::cExampleGame::SubmitDataToBeRendered(const float i_elapsedSecondCo
 	//Render the Ball
 	eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(meshes[1]), std::get<1>(meshes[1]), std::get<2>(meshes[1]), breakOutBallMeshRigidBody.position);
 
+	////Render the Bricks
+	for (size_t i = 0; i < brickPositions.size(); i++)
+	{
+		eae6320::Graphics::RenderMeshWithEffectAndTextureAtPosition(std::get<0>(meshes[i+2]), std::get<1>(meshes[i + 2]), std::get<2>(meshes[i + 2]), brickPositions[i]);
+	}
+
+	//Render the end state message
+	eae6320::Graphics::RenderSpriteWithEffectAndTexture(sprites[0], effects[0], textures[endStateMessage]);
+
 	//User specify's the background clear color
-	eae6320::Graphics::ClearColor(0.5f,0.0f,0.0f,1.0f);
+	eae6320::Graphics::ClearColor(ScreenFeedbackR, ScreenFeedbackG, ScreenFeedbackB,1.0f);
 }
 
 
@@ -226,7 +402,6 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	breakOutBallMeshRigidBody.position.x = breakOutPaddleMeshRigidBody.position.x;
 	breakOutBallMeshRigidBody.position.y = breakOutPaddleMeshRigidBody.position.y + 0.5f;
 	breakOutBallMeshRigidBody.position.z = breakOutPaddleMeshRigidBody.position.z;
-
 
 	//Effect and sprite pointers
 	eae6320::Graphics::Effect * newEffect;
@@ -255,7 +430,7 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 
 
 	//Call to factory function for sprites
-	result = eae6320::Graphics::Sprite::Factory(newSprite, -0.75f, 0.75f, 0.5f, 0.5f);
+	result = eae6320::Graphics::Sprite::Factory(newSprite, 0.0f, 0.0f, 1.0f, 1.0f);
 	if (!result)
 	{
 		EAE6320_ASSERT(result);
@@ -288,6 +463,44 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	textureHandles.push_back(newTexture);
 	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
+	//Bricks
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/SpaceBrick.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textureHandles.push_back(newTexture);
+	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
+
+	//End State Messages
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/youWin.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textureHandles.push_back(newTexture);
+	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/youLose.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textureHandles.push_back(newTexture);
+	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
+
+	result = eae6320::Graphics::cTexture::s_manager.Load("data/Textures/blank.png", newTexture);
+	if (!result)
+	{
+		EAE6320_ASSERT(result);
+		return Results::Failure;
+	}
+	textureHandles.push_back(newTexture);
+	textures.push_back(eae6320::Graphics::cTexture::s_manager.Get(newTexture));
 
 	//Mesh creation
 
@@ -312,6 +525,21 @@ eae6320::cResult eae6320::cExampleGame::Initialize()
 	meshHandles.push_back(newMesh);
 	meshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[1], textures[1], breakOutBallMeshRigidBody.position));
 
+
+	FillBrickPositions();
+
+	for (size_t i = 0; i < brickPositions.size(); i++)
+	{
+		result = eae6320::Graphics::Mesh::s_manager.Load("data/Meshes/SpaceBrick.fbx", newMesh);
+		if (!result)
+		{
+			EAE6320_ASSERT(result);
+			return Results::Failure;
+		}
+		meshHandles.push_back(newMesh);
+		//The Brick meshes
+		meshes.push_back(std::make_tuple(eae6320::Graphics::Mesh::s_manager.Get(newMesh), effects[1], textures[2], brickPositions[i]));
+	}
 	return Results::Success;
 }
 

@@ -8,6 +8,7 @@ return
 	{
 		"Meshes/SpacePaddle.lua",
 		"Meshes/Ball.lua",
+		"Meshes/SpaceBrick.lua",
 	},
 	shaders =
 	{
@@ -33,5 +34,9 @@ return
 		-- and then add the other textures that you use.
 		"Textures/SpacePaddle.png",
 		"Textures/Ball.png",
+		"Textures/SpaceBrick.png",
+		"Textures/youWin.png",
+		"Textures/youLose.png",
+		"Textures/blank.png",
 	},
 }

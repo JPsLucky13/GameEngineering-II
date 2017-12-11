@@ -100,6 +100,21 @@ namespace eae6320
 		float ballMaxScreenWidth = 3.8f;
 		bool ballReleased = false;
 
+		// Back ground flash
+		//-------------
+		float ScreenFeedbackR = 0.0f;
+		float ScreenFeedbackG = 0.0f;
+		float ScreenFeedbackB = 0.0f;
+		float feedbackCounter = 0.0f;
+		float timeToBlack = 0.25f;
+		float maxFeedbackCounterValue = 1.0f;
+		
+		float endStateCounter = 0.0f;
+		float timeToErase = 0.75f;
+		float maxEndStateCounterValue = 1.0f;
+		size_t endStateMessage = 5; //Value has to be 3,4 or 5 
+		
+
 		// Effects
 		//-------------
 		std::vector<eae6320::Graphics::Effect *> effects;
