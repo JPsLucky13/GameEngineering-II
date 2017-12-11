@@ -75,9 +75,9 @@ namespace eae6320
 		//-------------
 		bool isKeyPressedAlready;
 		
-		// KeyPressForMovableMesh
+		// KeyPressForBreakOutPaddleMesh
 		//-------------
-		bool isAKeyPressedForMovableMesh;
+		bool isAKeyPressedForBreakOutPaddleMesh;
 
 		// KeyPressForCamera
 		//-------------
@@ -87,6 +87,33 @@ namespace eae6320
 		//-------------
 		float counter = 0.0f;
 		float timeToSwitchTexture = 1.0f;
+
+		// Space Paddle Stats
+		//-------------
+		float spacePaddleSpeed = 5.0f;
+		float spacePaddleMaxScreenWidth = 3.5f;
+
+		// Ball Stats
+		//-------------
+		float ballSpeedX = 3.0f;
+		float ballSpeedY = 3.0f;
+		float ballMaxScreenWidth = 3.8f;
+		bool ballReleased = false;
+
+		// Back ground flash
+		//-------------
+		float ScreenFeedbackR = 0.0f;
+		float ScreenFeedbackG = 0.0f;
+		float ScreenFeedbackB = 0.0f;
+		float feedbackCounter = 0.0f;
+		float timeToBlack = 0.25f;
+		float maxFeedbackCounterValue = 1.0f;
+		
+		float endStateCounter = 0.0f;
+		float timeToErase = 0.75f;
+		float maxEndStateCounterValue = 1.0f;
+		size_t endStateMessage = 5; //Value has to be 3,4 or 5 
+		
 
 		// Effects
 		//-------------
@@ -105,17 +132,19 @@ namespace eae6320
 		//--------------
 		std::vector<eae6320::Graphics::Mesh::Handle> meshHandles;
 		std::vector<std::tuple<eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *,Math::sVector>> meshes;
-		std::vector<eae6320::Graphics::Mesh::Handle> translucentMeshHandles;
-		std::vector<std::tuple<eae6320::Graphics::Mesh *, eae6320::Graphics::Effect *, eae6320::Graphics::cTexture *, Math::sVector>> translucentMeshes;
 
 		// Camera
 		//--------------
 		eae6320::Graphics::Camera * gameCamera;
 		eae6320::Physics::sRigidBodyState cameraRigidBody;
 
-		// Movable Mesh sRigidbody
+		// BeakOut Paddle Mesh sRigidbody
 		//--------------
-		eae6320::Physics::sRigidBodyState meshRigidBody;
+		eae6320::Physics::sRigidBodyState breakOutPaddleMeshRigidBody;
+
+		// BeakOut Ball Mesh sRigidbody
+		//--------------
+		eae6320::Physics::sRigidBodyState breakOutBallMeshRigidBody;
 
 		// Static Mesh
 		Math::sVector floorPosition;

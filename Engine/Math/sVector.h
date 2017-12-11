@@ -61,6 +61,10 @@ namespace eae6320
 			friend float Dot( const sVector& i_lhs, const sVector& i_rhs );
 			friend sVector Cross( const sVector& i_lhs, const sVector& i_rhs );
 
+			//Distance
+			//---------
+			friend float Distance(const sVector& i_lhs, const sVector& i_rhs);
+
 			// Comparison
 			//-----------
 

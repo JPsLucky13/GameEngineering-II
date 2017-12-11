@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <Engine/Asserts/Asserts.h>
+#include <math.h>
 
 // Static Data Initialization
 //===========================
@@ -144,4 +145,11 @@ eae6320::Math::sVector eae6320::Math::Cross( const sVector& i_lhs, const sVector
 		( i_lhs.z * i_rhs.x ) - ( i_lhs.x * i_rhs.z ),
 		( i_lhs.x * i_rhs.y ) - ( i_lhs.y * i_rhs.x )
 	);
+}
+
+//Distance
+//--------
+float eae6320::Math::Distance(const sVector& i_lhs, const sVector& i_rhs)
+{
+	return sqrtf(((i_lhs.x - i_rhs.x) * (i_lhs.x - i_rhs.x)) + ((i_lhs.y - i_rhs.y) * (i_lhs.y - i_rhs.y)) + ((i_lhs.z - i_rhs.z) * (i_lhs.z - i_rhs.z)));
 }
